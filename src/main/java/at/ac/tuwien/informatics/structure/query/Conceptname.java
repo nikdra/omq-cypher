@@ -6,7 +6,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 /**
  * A class that represents a query atom of the form A(_) for a concept name A.
  */
-public class Conceptname implements Atom {
+public class Conceptname implements RewritableAtom {
 
     /**
      * The name of the concept.
@@ -51,7 +51,7 @@ public class Conceptname implements Atom {
 
     @Override
     public String toString() {
-        return this.name + "\n\t" + this.variable.toString();
+        return this.name + '(' + this.variable.toString() + ')';
     }
 
     /**
@@ -75,7 +75,7 @@ public class Conceptname implements Atom {
      * @return The new atom.
      */
     @Override
-    public Atom apply(Ontology o, OWLAxiom a) {
+    public RewritableAtom apply(Ontology o, OWLAxiom a) {
         return null;
     }
 }

@@ -6,7 +6,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 /**
  * A class that represents a role atom r(x,y) in the query for some role name "r" and variables "x","y".
  */
-public class Role implements Atom {
+public class Role implements RewritableAtom {
 
     /**
      * The name of the role.
@@ -59,7 +59,7 @@ public class Role implements Atom {
 
     @Override
     public String toString() {
-        return this.name + "\n\t" + this.left.toString() + "\n\t" + this.right.toString();
+        return this.name + '(' + this.left.toString() + ',' + this.right.toString() + ')';
     }
 
     /**
@@ -84,7 +84,7 @@ public class Role implements Atom {
      * @return The new atom.
      */
     @Override
-    public Atom apply(Ontology o, OWLAxiom a) {
+    public RewritableAtom apply(Ontology o, OWLAxiom a) {
         return null;
     }
 }

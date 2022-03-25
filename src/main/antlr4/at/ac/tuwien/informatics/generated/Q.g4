@@ -8,11 +8,19 @@ body : atom (',' atom)* ;
 
 atom : conceptname | role | path ;
 
-conceptname : WORD '(' variable ')' ;
+conceptname : WORDS '(' variable ')' ;
 
-role : WORD '(' left=variable ',' right=variable ')' ;
+role : WORDS '(' left=variable ',' right=variable ')' ;
 
-path : WORD '*'? ('/' WORD '*'?)* '(' variable ',' variable ')' ;
+path : elements '(' left=variable ',' right=variable ')' ;
+
+elements : pathElement ('/' pathElement )* ;
+
+pathElement : arbitraryLengthPathElement | singleLengthPathElement ;
+
+arbitraryLengthPathElement : WORDS '*' | '(' WORDS ('|' WORDS)+ ')' '*' ;
+
+singleLengthPathElement : WORDS | '(' WORDS ('|' WORDS)+ ')' ;
 
 variable : LETTER ;
 
@@ -21,6 +29,6 @@ fragment UPPERCASE : [A-Z] ;
 
 LETTER : LOWERCASE ;
 
-WORD : (LOWERCASE | UPPERCASE)+ ;
+WORDS : (LOWERCASE | UPPERCASE)+ ('_' WORDS)*;
 
 UNKNOWN_CHAR : . ;

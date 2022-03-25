@@ -58,10 +58,10 @@ public class TestVariable {
     public void testString() {
         Variable v1 = new Variable("x");
 
-        assertEquals("x, bound", v1.toString());
+        assertEquals("x", v1.toString());
 
         v1.setBound(false);
 
-        assertEquals("x, unbound", v1.toString());
+        assertEquals("x", v1.toString());
     }
 }

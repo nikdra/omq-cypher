@@ -52,6 +52,6 @@ public class TestConceptname {
     public void testString() {
         Conceptname c1 = new Conceptname("A", new Variable("x"));
 
-        assertEquals(c1.toString(), "A\n\tx, bound");
+        assertEquals(c1.toString(), "A(x)");
     }
 }

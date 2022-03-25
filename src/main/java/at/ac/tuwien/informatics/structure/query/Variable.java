@@ -40,6 +40,7 @@ public class Variable {
 
     @Override
     public boolean equals(Object obj) {
+        // TODO: we can name unbound variables the same, but they are different!
         if (obj == this) {
             return true;
         }
@@ -55,6 +56,6 @@ public class Variable {
 
     @Override
     public String toString() {
-        return this.name + ", " + (this.bound? "bound" : "unbound");
+        return this.name;
     }
 }

@@ -1,6 +1,8 @@
 package at.ac.tuwien.informatics.structure.query;
 
-import java.util.HashSet;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A class that represents a CRPQ.
@@ -10,11 +12,11 @@ public class Query {
     /**
      * The set of answer variables in the head.
      */
-    private final HashSet<Variable> head;
+    private final Set<Variable> head;
     /**
      * The set of atoms in the body.
      */
-    private final HashSet<Atom> body;
+    private final Set<Atom> body;
 
     /**
      * Initialize a new query object with a head and body.
@@ -22,7 +24,7 @@ public class Query {
      * @param head A set of answer {@link Variable}.
      * @param body A set of atoms {@link Atom}
      */
-    public Query(HashSet<Variable> head, HashSet<Atom> body) {
+    public Query(Set<Variable> head, Set<Atom> body) {
         this.head = head;
         this.body = body;
     }
@@ -52,17 +54,9 @@ public class Query {
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder();
-        str.append("Head:");
-        for (Variable v : this.head) {
-            str.append("\n\t");
-            str.append(v.toString());
-        }
-        str.append("\nBody");
-        for (Atom a : this.body) {
-            str.append("\n");
-            str.append(a.toString());
-        }
-        return str.toString();
+        return "q(" +
+                this.head.stream().map(Variable::toString).collect(Collectors.joining(",")) +
+                "):-" +
+                this.body.stream().map(Atom::toString).collect(Collectors.joining(","));
     }
 }

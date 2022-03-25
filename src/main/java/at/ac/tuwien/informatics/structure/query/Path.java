@@ -1,32 +1,61 @@
 package at.ac.tuwien.informatics.structure.query;
 
-import at.ac.tuwien.informatics.structure.Ontology;
-import org.semanticweb.owlapi.model.OWLAxiom;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * A class that represents a path atom \rho(x,y) in the query for a \Xi-restricted regular expression \rho and
+ * variables "x", "y".
+ */
 public class Path implements Atom {
+
     /**
-     * Return true if the atom can be replaced by another atom given an axiom.
-     *
-     * @param o The ontology wrapper object.
-     * @param a The axiom to be applied.
-     * @return True if the axiom is applicable, false otherwise.
+     * The variable on the left.
      */
-    @Override
-    public boolean applicable(Ontology o, OWLAxiom a) {
-        return false;
+    private Variable left;
+    /**
+     * The variable on the right.
+     */
+    private Variable right;
+    /**
+     * The elements of the path.
+     */
+    private final List<PathElement> elements;
+
+    public Path(List<PathElement> elements, Variable left, Variable right) {
+        this.elements = elements;
+        this.left = left;
+        this.right = right;
     }
 
-    /**
-     * Apply a replacement by an axiom on this atom and return the new atom.
-     * <p>
-     * Precondition for correctness: applicable was called before.
-     *
-     * @param o The ontology wrapper object.
-     * @param a The axiom to be applied.
-     * @return The new atom.
-     */
     @Override
-    public Atom apply(Ontology o, OWLAxiom a) {
-        return null;
+    public int hashCode() {
+        int hash = 3;
+        hash = 53 * hash + (this.elements != null ? this.elements.hashCode() : 0);
+        hash = 53 * hash + (this.left != null ? this.left.hashCode() : 0);
+        hash = 53 * hash + (this.right != null ? this.right.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof Path)){
+            return false;
+        }
+
+        Path p = (Path) obj;
+
+        return this.elements.equals(p.elements) && this.left.equals(p.left) && this.right.equals(p.right);
+    }
+
+    @Override
+    public String toString() {
+        return this.elements.stream().map(PathElement::toString).collect(Collectors.joining("/")) +
+                "(" + this.left.toString() + "," + this.right.toString() + ")";
     }
 }
