@@ -1,7 +1,7 @@
 package at.tuwien.informatics.structure;
 import at.ac.tuwien.informatics.generated.QLexer;
 import at.ac.tuwien.informatics.generated.QParser;
-import at.ac.tuwien.informatics.structure.QueryBuilder;
+import at.ac.tuwien.informatics.structure.InputQueryBuilder;
 import at.ac.tuwien.informatics.structure.query.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.*;
 
 import java.util.*;
 
-public class TestQueryBuilder {
+public class TestInputInputQueryBuilder {
 
     @Test
     public void testQueryConcept() {
@@ -22,14 +22,14 @@ public class TestQueryBuilder {
 
         ParseTree tree = parser.query();
 
-        Query q = (Query) new QueryBuilder().visit(tree);
+        InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
         HashSet<Variable> head = new HashSet<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Conceptname("Pizza", new Variable("x")));
 
-        Query q1 = new Query(head, body);
+        InputQuery q1 = new InputQuery(head, body);
 
         assertEquals(q, q1);
     }
@@ -42,7 +42,7 @@ public class TestQueryBuilder {
 
         ParseTree tree = parser.query();
 
-        Query q = (Query) new QueryBuilder().visit(tree);
+        InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
         HashSet<Variable> head = new HashSet<>();
         head.add(new Variable("x"));
@@ -50,7 +50,7 @@ public class TestQueryBuilder {
         body.add(new Conceptname("Pizza", new Variable("x")));
         body.add(new Conceptname("Vegetarian", new Variable("y")));
 
-        Query q1 = new Query(head, body);
+        InputQuery q1 = new InputQuery(head, body);
 
         assertEquals(q, q1);
     }
@@ -63,14 +63,14 @@ public class TestQueryBuilder {
 
         ParseTree tree = parser.query();
 
-        Query q = (Query) new QueryBuilder().visit(tree);
+        InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
         HashSet<Variable> head = new HashSet<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Role("hasIngredient", new Variable("x"), new Variable("y")));
 
-        Query q1 = new Query(head, body);
+        InputQuery q1 = new InputQuery(head, body);
 
         assertEquals(q, q1);
     }
@@ -83,7 +83,7 @@ public class TestQueryBuilder {
 
         ParseTree tree = parser.query();
 
-        Query q = (Query) new QueryBuilder().visit(tree);
+        InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
         HashSet<Variable> head = new HashSet<>();
         head.add(new Variable("x"));
@@ -92,7 +92,7 @@ public class TestQueryBuilder {
         HashSet<Atom> body = new HashSet<>();
         body.add(new Role("hasIngredient", new Variable("x"), new Variable("y")));
 
-        Query q1 = new Query(head, body);
+        InputQuery q1 = new InputQuery(head, body);
 
         assertEquals(q, q1);
     }
@@ -105,14 +105,14 @@ public class TestQueryBuilder {
 
         ParseTree tree = parser.query();
 
-        Query q = (Query) new QueryBuilder().visit(tree);
+        InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
         HashSet<Variable> head = new HashSet<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Conceptname("Pizza", new Variable("x")));
 
-        Query q1 = new Query(head, body);
+        InputQuery q1 = new InputQuery(head, body);
 
         assertEquals(q, q1);
     }
@@ -125,7 +125,7 @@ public class TestQueryBuilder {
 
         ParseTree tree = parser.query();
 
-        Query q = (Query) new QueryBuilder().visit(tree);
+        InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
         HashSet<Variable> head = new HashSet<>();
         head.add(new Variable("x"));
@@ -133,7 +133,7 @@ public class TestQueryBuilder {
         body.add(new Conceptname("Pizza", new Variable("x")));
         body.add(new Conceptname("Pizza", new Variable("y")));
 
-        Query q1 = new Query(head, body);
+        InputQuery q1 = new InputQuery(head, body);
 
         assertEquals(q, q1);
     }
@@ -146,14 +146,14 @@ public class TestQueryBuilder {
 
         ParseTree tree = parser.query();
 
-        Query q = (Query) new QueryBuilder().visit(tree);
+        InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
         HashSet<Variable> head = new HashSet<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Conceptname("emergency_vehicle", new Variable("x")));
 
-        Query q1 = new Query(head, body);
+        InputQuery q1 = new InputQuery(head, body);
 
         assertEquals(q, q1);
     }
@@ -166,7 +166,7 @@ public class TestQueryBuilder {
 
         ParseTree tree = parser.query();
 
-        Query q = (Query) new QueryBuilder().visit(tree);
+        InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
         HashSet<Variable> head = new HashSet<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
@@ -178,7 +178,7 @@ public class TestQueryBuilder {
 
         body.add(new Path(elements, new Variable("x"), new Variable("y")));
 
-        Query q1 = new Query(head, body);
+        InputQuery q1 = new InputQuery(head, body);
 
         assertEquals(q, q1);
     }
@@ -191,7 +191,7 @@ public class TestQueryBuilder {
 
         ParseTree tree = parser.query();
 
-        Query q = (Query) new QueryBuilder().visit(tree);
+        InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
         HashSet<Variable> head = new HashSet<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
@@ -203,7 +203,7 @@ public class TestQueryBuilder {
 
         body.add(new Path(elements, new Variable("x"), new Variable("y")));
 
-        Query q1 = new Query(head, body);
+        InputQuery q1 = new InputQuery(head, body);
 
         assertNotEquals(q, q1);
     }

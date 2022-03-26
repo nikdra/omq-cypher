@@ -3,7 +3,7 @@ package at.ac.tuwien.informatics.structure.query;
 import at.ac.tuwien.informatics.structure.Ontology;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-public class ArbitraryLengthSinglePathAtom implements RewritableAtom {
+public class ArbitraryLengthSinglePathAtom implements SinglePathAtom {
 
     /**
      * Return true if the atom can be replaced by another atom given an axiom.

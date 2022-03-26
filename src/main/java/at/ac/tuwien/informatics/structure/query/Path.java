@@ -1,7 +1,10 @@
 package at.ac.tuwien.informatics.structure.query;
 
 
+import at.ac.tuwien.informatics.structure.Ontology;
+
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -57,5 +60,9 @@ public class Path implements Atom {
     public String toString() {
         return this.elements.stream().map(PathElement::toString).collect(Collectors.joining("/")) +
                 "(" + this.left.toString() + "," + this.right.toString() + ")";
+    }
+
+    public Set<SinglePathAtom> saturate(Ontology o) {
+        return null;
     }
 }
