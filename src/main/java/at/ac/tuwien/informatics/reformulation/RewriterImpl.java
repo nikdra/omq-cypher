@@ -10,9 +10,6 @@ import java.util.*;
  * An implementation of a rewriter for XI-restricted queries.
  */
 public class RewriterImpl implements Rewriter {
-    // TODO add map of variables?, or add it to the query?
-    // TODO add variable counter here? guarantees that they're fresh
-
 
     /**
      * Given a Xi-restricted query q, rewrite q into a set of queries such that the evaluation over the data returns
@@ -85,13 +82,12 @@ public class RewriterImpl implements Rewriter {
                 List<PathElement> elements = b.getElements();
                 Iterator<PathElement> it = elements.listIterator();
                 Variable left = b.getLeft();
-                Variable right = new Variable("v" + ++variable_counter);
                 PathElement element = it.next();
                 while(it.hasNext()) {
+                    Variable right = new Variable("v" + ++variable_counter);
                     body.add(element.toSinglePathAtom(left, right));
                     element = it.next();
                     left = new Variable("v" + variable_counter);
-                    right = new Variable("v" + ++variable_counter);
                 }
                 body.add(element.toSinglePathAtom(left, b.getRight()));
             }

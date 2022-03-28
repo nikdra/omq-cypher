@@ -45,4 +45,48 @@ public class TestRewriterImpl {
 
         assertEquals(qp, qpp);
     }
+
+    @Test
+    public void testSaturateTwoPaths() throws OWLOntologyCreationException, NotOWL2QLException {
+        // load ontology
+        File resourcesDirectory = new File("src/test/resources/subroles.owl");
+
+        HashSet<Variable> head = new HashSet<>();
+        head.add(new Variable("x"));
+        HashSet<Atom> body = new HashSet<>();
+        List<PathElement> elements = new LinkedList<>();
+        elements.add(new SingleLengthPathElement(new HashSet<>(Collections.singleton("s"))));
+        elements.add(new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("r"))));
+        body.add(new Path(elements, new Variable("x"), new Variable("y")));
+
+        elements = new LinkedList<>();
+        elements.add(new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("s"))));
+        elements.add(new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("r"))));
+        elements.add(new SingleLengthPathElement(new HashSet<>(Collections.singleton("r"))));
+        body.add(new Path(elements, new Variable("z"), new Variable("y")));
+
+        // create query
+        InputQuery q = new InputQuery(head, body);
+
+        // call rewriter
+        RewriterImpl rewriter = new RewriterImpl();
+        RewritableQuery qp = rewriter.saturatePaths(q, new Ontology(resourcesDirectory.getAbsolutePath()));
+
+        // check if results are as expected
+        RewritableQuery qpp = new RewritableQuery(new HashSet<>(Collections.singleton(new Variable("x"))),
+                new HashSet<>(Arrays.asList(
+                        new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
+                                new Variable("x"), new Variable("v1")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                                new Variable("v1"), new Variable("y")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
+                                new Variable("z"), new Variable("v2")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                                new Variable("v2"), new Variable("v3")),
+                        new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                                new Variable("v3"), new Variable("y"))
+                )));
+
+        assertEquals(qpp, qp);
+    }
 }
