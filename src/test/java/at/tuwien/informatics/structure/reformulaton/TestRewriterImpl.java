@@ -37,9 +37,9 @@ public class TestRewriterImpl {
         // check if results are as expected
         RewritableQuery qpp = new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
-                        new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
+                        new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s", "t")),
                                 new Variable("x"), new Variable("v1")),
-                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "t")),
                                 new Variable("v1"), new Variable("y"))
                 )));
 
@@ -61,8 +61,8 @@ public class TestRewriterImpl {
 
         elements = new LinkedList<>();
         elements.add(new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("s"))));
-        elements.add(new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("r"))));
-        elements.add(new SingleLengthPathElement(new HashSet<>(Collections.singleton("r"))));
+        elements.add(new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("t"))));
+        elements.add(new SingleLengthPathElement(new HashSet<>(Collections.singleton("t"))));
         body.add(new Path(elements, new Variable("z"), new Variable("y")));
 
         // create query
@@ -75,15 +75,15 @@ public class TestRewriterImpl {
         // check if results are as expected
         RewritableQuery qpp = new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
-                        new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
+                        new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s", "t")),
                                 new Variable("x"), new Variable("v3")),
-                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "t")),
                                 new Variable("v3"), new Variable("y")),
-                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s", "t")),
                                 new Variable("z"), new Variable("v1")),
-                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("t")),
                                 new Variable("v1"), new Variable("v2")),
-                        new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                        new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton("t")),
                                 new Variable("v2"), new Variable("y"))
                 )));
 

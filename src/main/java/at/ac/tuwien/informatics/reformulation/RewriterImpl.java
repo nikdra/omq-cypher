@@ -72,7 +72,6 @@ public class RewriterImpl implements Rewriter {
             }
             else if (a instanceof Role) { // Role atom
                 body.add(((Role) a).toSingleLengthSinglePathAtom());  // transform to single length single path atom
-
             }
             else { // Path
                 Path b = (Path) a;

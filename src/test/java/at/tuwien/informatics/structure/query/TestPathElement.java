@@ -74,7 +74,7 @@ public class TestPathElement {
         // load ontology
         File resourcesDirectory = new File("src/test/resources/subroles.owl");
 
-        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList("r", "s")));
+        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList("r", "s", "t")));
         PathElement p2 = new SingleLengthPathElement(new HashSet<>(Collections.singleton("s")));
         p2.saturate(new Ontology(resourcesDirectory.getAbsolutePath()));
 
