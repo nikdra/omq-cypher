@@ -2,6 +2,7 @@ package at.ac.tuwien.informatics.reformulation;
 
 import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.query.*;
+import com.google.errorprone.annotations.Var;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 import java.util.*;
@@ -43,7 +44,6 @@ public class RewriterImpl implements Rewriter {
                         Q.add(tau(reduce(qp, a1, a2)));
                     }
                 }
-
                 // TODO path rewritings
             }
         }
@@ -105,7 +105,63 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery tau(RewritableQuery q) {
-        return q;
+        // map of variables and the number of atoms they occur in
+        Map<Variable, Integer> variableCount = new HashMap<>();
+        // first pass: get number of terms each variable occurs in
+        for (RewritableAtom a : q.getBody()) {
+            if (a instanceof Conceptname) { // concept name
+                Conceptname b = (Conceptname) a;
+                if (b.getTerm() instanceof Variable) {
+                    Integer count = variableCount.getOrDefault((Variable) b.getTerm(), 0);
+                    variableCount.put((Variable) b.getTerm(), count + 1);
+                }
+            }
+            if (a instanceof SinglePathAtom) { // single path atom - includes roles
+                SinglePathAtom b = (SinglePathAtom) a;
+                if (b.getLeft() instanceof Variable) {
+                    Integer count = variableCount.getOrDefault((Variable) b.getLeft(), 0);
+                    variableCount.put((Variable) b.getLeft(), count + 1);
+                }
+                if (b.getRight() instanceof Variable) {
+                    Integer count = variableCount.getOrDefault((Variable) b.getRight(), 0);
+                    variableCount.put((Variable) b.getRight(), count + 1);
+                }
+            }
+        }
+        // second pass: replace all entries that are not constants or answer variables with unbound variables
+        Set<RewritableAtom> body = new HashSet<>();
+        for (RewritableAtom a : q.getBody()) {
+            if (a instanceof Conceptname) { // concept name
+                Conceptname b = (Conceptname) a;
+                Term t = b.getTerm();
+                if (b.getTerm() instanceof Variable) {  // contains variable
+                    if ((variableCount.get((Variable) b.getTerm()) == 1) &&
+                            !q.getHead().contains((Variable) b.getTerm())) { // unbound variable
+                        t = new UnboundVariable();  // replace term
+                    }
+                }
+                body.add(new Conceptname(b.getName(), t)); // add to new query
+            }
+            if (a instanceof SinglePathAtom) { // single path atom - includes roles
+                SinglePathAtom b = (SinglePathAtom) a;
+                Term left = b.getLeft();
+                Term right = b.getRight();
+                if (b.getLeft() instanceof Variable) {
+                    if ((variableCount.get((Variable) b.getLeft()) == 1) &&
+                            !q.getHead().contains((Variable) b.getLeft())) { // unbound variable
+                        left = new UnboundVariable();
+                    }
+                }
+                if (b.getRight() instanceof Variable) {
+                    if ((variableCount.get((Variable) b.getRight()) == 1) &&
+                            !q.getHead().contains((Variable) b.getRight())) { // unbound variable
+                        right = new UnboundVariable();
+                    }
+                }
+                body.add(b.replaceTerms(left, right));
+            }
+        }
+        return new RewritableQuery(new LinkedList<>(q.getHead()), body);
     }
 
     /**

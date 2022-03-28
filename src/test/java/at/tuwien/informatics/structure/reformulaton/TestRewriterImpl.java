@@ -107,9 +107,15 @@ public class TestRewriterImpl {
                                 new Variable("v3"), new Variable("y")),
                         new Conceptname("A", new Variable("u"))
                 )));
+
+        // call rewriter
+        RewriterImpl rewriter = new RewriterImpl();
+        RewritableQuery qp = rewriter.tau(q);
+
         // should become q(x):-(r|s)(x, v1),r*(v1, y),(r|s)*(_,v2),r*(v2, v3),r(v3, y), A(_).
         // we can't check equality because all unbound variables are different unless they're the same object
-        // (by definition). However, we can check the query string.
+        // (by definition). However, we can check the query strings.
         System.out.println(q);
+        System.out.println(qp);
     }
 }

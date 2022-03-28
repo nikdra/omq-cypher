@@ -78,4 +78,12 @@ public class Conceptname implements RewritableAtom {
     public RewritableAtom apply(Ontology o, OWLAxiom a) {
         return null;
     }
+
+    public Term getTerm() {
+        return term;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

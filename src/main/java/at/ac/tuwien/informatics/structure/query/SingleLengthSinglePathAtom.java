@@ -3,6 +3,7 @@ package at.ac.tuwien.informatics.structure.query;
 import at.ac.tuwien.informatics.structure.Ontology;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -58,5 +59,10 @@ public class SingleLengthSinglePathAtom extends SinglePathAtom {
     @Override
     public String toString() {
         return super.toString() + "(" + this.left.toString() +"," + this.right.toString() + ")";
+    }
+
+    @Override
+    public SinglePathAtom replaceTerms(Term left, Term right) {
+        return new SingleLengthSinglePathAtom(new HashSet<>(this.rolenames), this.left, this.right);
     }
 }

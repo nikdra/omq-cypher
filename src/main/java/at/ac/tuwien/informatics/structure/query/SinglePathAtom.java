@@ -30,4 +30,14 @@ public abstract class SinglePathAtom implements RewritableAtom {
         hash = 53 * hash + (this.right != null ? this.right.hashCode() : 0);
         return hash;
     }
+
+    public Term getLeft() {
+        return left;
+    }
+
+    public Term getRight() {
+        return right;
+    }
+
+    public abstract SinglePathAtom replaceTerms(Term left, Term right);
 }
