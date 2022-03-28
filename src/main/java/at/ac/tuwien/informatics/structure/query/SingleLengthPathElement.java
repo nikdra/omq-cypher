@@ -1,8 +1,5 @@
 package at.ac.tuwien.informatics.structure.query;
 
-
-import at.ac.tuwien.informatics.structure.Ontology;
-
 import java.util.Set;
 
 /**
@@ -39,8 +36,15 @@ public class SingleLengthPathElement extends PathElement {
         return super.toString();
     }
 
+    /**
+     * Convert this path element to a single path atom.
+     *
+     * @param left The left {@link Term}.
+     * @param right The right {@link Term}.
+     * @return This path element as a rewritable single path atom.
+     */
     @Override
-    public SinglePathAtom toSinglePathAtom(Variable left, Variable right) {
+    public SinglePathAtom toSinglePathAtom(Term left, Term right) {
         return new SingleLengthSinglePathAtom(this.rolenames, left, right);
     }
 }

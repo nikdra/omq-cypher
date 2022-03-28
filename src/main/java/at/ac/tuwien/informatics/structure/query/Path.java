@@ -13,19 +13,19 @@ import java.util.stream.Collectors;
 public class Path implements Atom {
 
     /**
-     * The variable on the left.
+     * The term on the left.
      */
-    private final Variable left;
+    private final Term left;
     /**
-     * The variable on the right.
+     * The term on the right.
      */
-    private final Variable right;
+    private final Term right;
     /**
      * The elements of the path.
      */
     private final List<PathElement> elements;
 
-    public Path(List<PathElement> elements, Variable left, Variable right) {
+    public Path(List<PathElement> elements, Term left, Term right) {
         this.elements = elements;
         this.left = left;
         this.right = right;
@@ -61,19 +61,36 @@ public class Path implements Atom {
                 "(" + this.left.toString() + "," + this.right.toString() + ")";
     }
 
+    /**
+     * Saturate each element of the path by exhaustively applying the subrole axioms for each role in the set of role
+     * names in the element.
+     * @param o The ontology.
+     */
     public void saturate(Ontology o) {
         elements.forEach(e -> e.saturate(o));
     }
 
+    /**
+     * Get the list of elements in this path.
+     * @return The list of path elements.
+     */
     public List<PathElement> getElements() {
         return elements;
     }
 
-    public Variable getLeft() {
+    /**
+     * Get the Term on the left.
+     * @return The Term on the left.
+     */
+    public Term getLeft() {
         return left;
     }
 
-    public Variable getRight() {
-        return right;
+    /**
+     * Get the Term on the right.
+     * @return The Term on the right.
+     */
+    public Term getRight() {
+            return right;
     }
 }

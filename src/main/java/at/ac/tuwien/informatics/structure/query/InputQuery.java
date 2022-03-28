@@ -1,6 +1,7 @@
 package at.ac.tuwien.informatics.structure.query;
 
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,7 +13,7 @@ public class InputQuery implements Query {
     /**
      * The set of answer variables in the head.
      */
-    private final Set<Variable> head;
+    private final List<Variable> head;
     /**
      * The set of atoms in the body.
      */
@@ -24,7 +25,7 @@ public class InputQuery implements Query {
      * @param head A set of answer {@link Variable}.
      * @param body A set of atoms {@link Atom}
      */
-    public InputQuery(Set<Variable> head, Set<Atom> body) {
+    public InputQuery(List<Variable> head, Set<Atom> body) {
         this.head = head;
         this.body = body;
     }
@@ -60,10 +61,18 @@ public class InputQuery implements Query {
                 this.body.stream().map(Atom::toString).collect(Collectors.joining(","));
     }
 
-    public Set<Variable> getHead() {
+    /**
+     * Get the head of this query.
+     * @return The list of variables in the head.
+     */
+    public List<Variable> getHead() {
         return head;
     }
 
+    /**
+     * Get the body of this query.
+     * @return The set of atoms in the body.
+     */
     public Set<Atom> getBody() {
         return body;
     }

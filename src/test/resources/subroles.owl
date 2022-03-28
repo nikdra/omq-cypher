@@ -19,7 +19,12 @@
      -->
 
 
-    
+    <!-- http://www.co-ode.org/ontologies/testont.owl#t -->
+
+
+        <owl:ObjectProperty rdf:about="http://www.co-ode.org/ontologies/testont.owl#t">
+            <rdfs:subPropertyOf rdf:resource="http://www.co-ode.org/ontologies/testont.owl#r"/>
+        </owl:ObjectProperty>
 
 
     <!-- http://www.co-ode.org/ontologies/testont.owl#r -->

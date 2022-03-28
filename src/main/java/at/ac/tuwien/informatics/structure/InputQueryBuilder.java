@@ -21,7 +21,7 @@ public class InputQueryBuilder extends QBaseVisitor<Object> {
      */
     @Override
     public Object visitHead(QParser.HeadContext ctx) {
-        Set<Variable> variables = new HashSet<>();
+        List<Variable> variables = new LinkedList<>();
         for (int i = 0; i < ctx.getChildCount(); i++) {
             ParseTree c = ctx.getChild(i);
             Object result = c.accept(this);
@@ -123,7 +123,7 @@ public class InputQueryBuilder extends QBaseVisitor<Object> {
      */
     @Override
     public Object visitQuery(QParser.QueryContext ctx) {
-        Set<Variable> head = (Set<Variable>) visit(ctx.head());
+        List<Variable> head = (List<Variable>) visit(ctx.head());
         Set<Atom> body = (Set<Atom>) visit(ctx.body());
         return new InputQuery(head, body);
     }

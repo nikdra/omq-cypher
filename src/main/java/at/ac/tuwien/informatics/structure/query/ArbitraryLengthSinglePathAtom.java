@@ -3,6 +3,7 @@ package at.ac.tuwien.informatics.structure.query;
 import at.ac.tuwien.informatics.structure.Ontology;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Set;
  */
 public class ArbitraryLengthSinglePathAtom extends SinglePathAtom {
 
-    public ArbitraryLengthSinglePathAtom(Set<String> rolenames, Variable left, Variable right) {
+    public ArbitraryLengthSinglePathAtom(Set<String> rolenames, Term left, Term right) {
         super(rolenames, left, right);
     }
 
@@ -58,5 +59,17 @@ public class ArbitraryLengthSinglePathAtom extends SinglePathAtom {
     @Override
     public String toString() {
         return super.toString() + "*(" + this.left.toString() +"," + this.right.toString() + ")";
+    }
+
+    /**
+     * Create a new arbitrary length single path atom with the given terms.
+     *
+     * @param left The left {@link Term}.
+     * @param right The right {@link Term}.
+     * @return A new arbitrary length single path atom, that can be rewritten.
+     */
+    @Override
+    public SinglePathAtom replaceTerms(Term left, Term right) {
+        return new ArbitraryLengthSinglePathAtom(new HashSet<>(this.rolenames), left, right);
     }
 }
