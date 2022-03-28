@@ -2,10 +2,12 @@ package at.tuwien.informatics.structure.query;
 
 import at.ac.tuwien.informatics.structure.query.Atom;
 import at.ac.tuwien.informatics.structure.query.Role;
+import at.ac.tuwien.informatics.structure.query.SingleLengthSinglePathAtom;
 import at.ac.tuwien.informatics.structure.query.Variable;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,9 +44,23 @@ public class TestRole {
         assertEquals(r1, r2);
 
         HashSet<Atom> set1 = new HashSet<>(Arrays.asList(r1, r2));
-        HashSet<Atom> set2 = new HashSet<>();
-        set2.add(r1);
+        HashSet<Atom> set2 = new HashSet<>(Collections.singleton(r1));
 
         assertEquals(set1, set2);
+    }
+
+    @Test
+    public void testToSingleLengthSinglePathAtom() {
+        Role r = new Role("r", new Variable("x"), new Variable("y"));
+        SingleLengthSinglePathAtom rp = r.toSingleLengthSinglePathAtom();
+        SingleLengthSinglePathAtom rpp = new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                new Variable("x"), new Variable("y"));
+
+        assertEquals(rp, rpp);
+
+        rpp = new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")), new Variable("x"),
+                new Variable("x"));
+
+        assertNotEquals(rp, rpp);
     }
 }

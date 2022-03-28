@@ -4,15 +4,14 @@ import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.query.*;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * An implementation of a rewriter for XI-restricted queries.
  */
 public class RewriterImpl implements Rewriter {
     // TODO add map of variables?, or add it to the query?
+    // TODO add variable counter here? guarantees that they're fresh
 
 
     /**
@@ -65,21 +64,39 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery saturatePaths(InputQuery q, Ontology o) {
-        // idea: iterate over atoms, apply role inclusion if it's a path atom
+        // iterate over atoms, apply role inclusion if it's a path atom and split
+        // transform roles into single length single path atoms
         // otherwise, just add to query
+        int variable_counter = 0;
         Set<RewritableAtom> body = new HashSet<>();
         for (Atom a : q.getBody()) {
             if (a instanceof Conceptname) { // Concept name
                 body.add((Conceptname) a);
             }
             else if (a instanceof Role) { // Role atom
-                body.add((Role) a);
+                body.add(((Role) a).toSingleLengthSinglePathAtom());  // transform to single length single path atom
+
             }
             else { // Path
-                body.addAll(((Path) a).saturate(o));
+                Path b = (Path) a;
+                // saturate
+                b.saturate(o);
+                // get elements and split into single path atoms
+                List<PathElement> elements = b.getElements();
+                Iterator<PathElement> it = elements.listIterator();
+                Variable left = b.getLeft();
+                Variable right = new Variable("v" + ++variable_counter);
+                PathElement element = it.next();
+                while(it.hasNext()) {
+                    body.add(element.toSinglePathAtom(left, right));
+                    element = it.next();
+                    left = new Variable("v" + variable_counter);
+                    right = new Variable("v" + ++variable_counter);
+                }
+                body.add(element.toSinglePathAtom(left, b.getRight()));
             }
         }
-        // TODO for correctness, splitting can't be done individually, but only here
+
         Set<Variable> head = new HashSet<>(q.getHead());
         return new RewritableQuery(head, body);
     }
@@ -87,7 +104,7 @@ public class RewriterImpl implements Rewriter {
     private RewritableQuery splitPaths(RewritableQuery q) {
         // for each path, split it up
         // use counter to add new bound variables
-        // unbound variables will be denoted '_'
+        // unbound variables will be denoted '_' by tau
         return q;
     }
 

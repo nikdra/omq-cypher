@@ -4,7 +4,6 @@ package at.ac.tuwien.informatics.structure.query;
 import at.ac.tuwien.informatics.structure.Ontology;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -16,11 +15,11 @@ public class Path implements Atom {
     /**
      * The variable on the left.
      */
-    private Variable left;
+    private final Variable left;
     /**
      * The variable on the right.
      */
-    private Variable right;
+    private final Variable right;
     /**
      * The elements of the path.
      */
@@ -62,7 +61,19 @@ public class Path implements Atom {
                 "(" + this.left.toString() + "," + this.right.toString() + ")";
     }
 
-    public Set<SinglePathAtom> saturate(Ontology o) {
-        return null;
+    public void saturate(Ontology o) {
+        elements.forEach(e -> e.saturate(o));
+    }
+
+    public List<PathElement> getElements() {
+        return elements;
+    }
+
+    public Variable getLeft() {
+        return left;
+    }
+
+    public Variable getRight() {
+        return right;
     }
 }

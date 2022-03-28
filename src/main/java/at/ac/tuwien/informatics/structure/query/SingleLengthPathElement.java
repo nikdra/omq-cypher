@@ -1,6 +1,8 @@
 package at.ac.tuwien.informatics.structure.query;
 
 
+import at.ac.tuwien.informatics.structure.Ontology;
+
 import java.util.Set;
 
 /**
@@ -15,13 +17,6 @@ public class SingleLengthPathElement extends PathElement {
      */
     public SingleLengthPathElement(Set<String> rolenames) {
         super(rolenames);
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 53 * hash + (this.rolenames != null ? this.rolenames.hashCode() : 0);
-        return hash;
     }
 
     @Override
@@ -42,5 +37,10 @@ public class SingleLengthPathElement extends PathElement {
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    @Override
+    public SinglePathAtom toSinglePathAtom(Variable left, Variable right) {
+        return new SingleLengthSinglePathAtom(this.rolenames, left, right);
     }
 }

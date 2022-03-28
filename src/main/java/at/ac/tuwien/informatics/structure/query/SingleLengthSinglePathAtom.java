@@ -3,7 +3,17 @@ package at.ac.tuwien.informatics.structure.query;
 import at.ac.tuwien.informatics.structure.Ontology;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
-public class SingleLengthSinglePathAtom implements SinglePathAtom {
+import java.util.Set;
+
+/**
+ * A class representing a single path atom (r \cup ...)(x,y) of single length.
+ */
+public class SingleLengthSinglePathAtom extends SinglePathAtom {
+
+    public SingleLengthSinglePathAtom(Set<String> rolenames, Variable left, Variable right) {
+        super(rolenames, left, right);
+    }
+
     /**
      * Return true if the atom can be replaced by another atom given an axiom.
      *
@@ -28,5 +38,25 @@ public class SingleLengthSinglePathAtom implements SinglePathAtom {
     @Override
     public RewritableAtom apply(Ontology o, OWLAxiom a) {
         return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof SingleLengthSinglePathAtom)){
+            return false;
+        }
+
+        SingleLengthSinglePathAtom r = (SingleLengthSinglePathAtom) obj;
+
+        return this.rolenames.equals(r.rolenames) && this.left.equals(r.left) && this.right.equals(r.right);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "(" + this.left.toString() +"," + this.right.toString() + ")";
     }
 }

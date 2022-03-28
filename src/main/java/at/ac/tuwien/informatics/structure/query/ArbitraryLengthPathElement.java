@@ -1,7 +1,8 @@
 package at.ac.tuwien.informatics.structure.query;
 
+import at.ac.tuwien.informatics.structure.Ontology;
+
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * A class that represents an element of a path that is of arbitrary length.
@@ -15,13 +16,6 @@ public class ArbitraryLengthPathElement extends PathElement {
      */
     public ArbitraryLengthPathElement(Set<String> rolenames) {
         super(rolenames);
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 53 * hash + (this.rolenames != null ? this.rolenames.hashCode() : 0);
-        return hash;
     }
 
     @Override
@@ -44,4 +38,8 @@ public class ArbitraryLengthPathElement extends PathElement {
         return super.toString() + "*";
     }
 
+    @Override
+    public SinglePathAtom toSinglePathAtom(Variable left, Variable right) {
+        return new ArbitraryLengthSinglePathAtom(this.rolenames, left, right);
+    }
 }
