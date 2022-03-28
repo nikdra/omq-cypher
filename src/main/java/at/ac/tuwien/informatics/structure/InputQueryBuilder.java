@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Class for extracting the query abstract syntax tree from the tree walk in the parser {@link QParser}.
  */
-public class QueryBuilder extends QBaseVisitor<Object> {
+public class InputQueryBuilder extends QBaseVisitor<Object> {
 
     /**
      * Visit the head of the query and return a set of variables (the answer variables).
@@ -119,13 +119,13 @@ public class QueryBuilder extends QBaseVisitor<Object> {
      * Returns a query with head and body.
      *
      * @param ctx The query context of the parser
-     * @return {@link Query}.
+     * @return {@link InputQuery}.
      */
     @Override
     public Object visitQuery(QParser.QueryContext ctx) {
         Set<Variable> head = (Set<Variable>) visit(ctx.head());
         Set<Atom> body = (Set<Atom>) visit(ctx.body());
-        return new Query(head, body);
+        return new InputQuery(head, body);
     }
 
     /**

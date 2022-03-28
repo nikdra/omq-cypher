@@ -7,7 +7,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
  * An interface that represents a rewritable atom in the query body.
  */
 
-public interface RewritableAtom extends Atom{
+public interface RewritableAtom extends Atom {
 
     /**
      * Return true if the atom can be replaced by another atom given an axiom.

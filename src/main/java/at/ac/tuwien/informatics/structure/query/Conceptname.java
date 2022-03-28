@@ -15,7 +15,7 @@ public class Conceptname implements RewritableAtom {
     /**
      * The variable in the atom.
      */
-    private Variable variable;
+    private final Variable variable;
 
     /**
      * Initialize a new Conceptname object.

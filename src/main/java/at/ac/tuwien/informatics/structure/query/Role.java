@@ -1,12 +1,12 @@
 package at.ac.tuwien.informatics.structure.query;
 
-import at.ac.tuwien.informatics.structure.Ontology;
-import org.semanticweb.owlapi.model.OWLAxiom;
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * A class that represents a role atom r(x,y) in the query for some role name "r" and variables "x","y".
  */
-public class Role implements RewritableAtom {
+public class Role implements Atom {
 
     /**
      * The name of the role.
@@ -15,11 +15,11 @@ public class Role implements RewritableAtom {
     /**
      * The variable on the left.
      */
-    private Variable left;
+    private final Variable left;
     /**
      * The variable on the right.
      */
-    private Variable right;
+    private final Variable right;
 
     /**
      * Initialize a new Role object.
@@ -62,29 +62,8 @@ public class Role implements RewritableAtom {
         return this.name + '(' + this.left.toString() + ',' + this.right.toString() + ')';
     }
 
-    /**
-     * Return true if the atom can be replaced by another atom given an axiom.
-     *
-     * @param o The ontology wrapper object.
-     * @param a The axiom to be applied.
-     * @return True if the axiom is applicable, false otherwise.
-     */
-    @Override
-    public boolean applicable(Ontology o, OWLAxiom a) {
-        return false;
+    public SingleLengthSinglePathAtom toSingleLengthSinglePathAtom() {
+        return new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton(this.name)), this.left, this.right);
     }
 
-    /**
-     * Apply a replacement by an axiom on this atom and return the new atom.
-     * <p>
-     * Precondition for correctness: applicable was called before.
-     *
-     * @param o The ontology wrapper object.
-     * @param a The axiom to be applied.
-     * @return The new atom.
-     */
-    @Override
-    public RewritableAtom apply(Ontology o, OWLAxiom a) {
-        return null;
-    }
 }

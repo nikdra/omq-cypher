@@ -17,7 +17,7 @@ public class Ontology {
     /**
      * The OWL2 QL ontology to be used in QA.
      */
-    private OWLOntology ontology;
+    private final OWLOntology ontology;
     /**
      * A Map that maps simple class names/labels to the class in the ontology.
      */
@@ -25,7 +25,7 @@ public class Ontology {
     /**
      * A Map that maps simple role names to the properties in the ontology.
      */
-    private HashMap<String, OWLProperty> propertyMap;
+    private HashMap<String, OWLObjectProperty> propertyMap;
 
     /**
      * Initialize a new Ontology Wrapper from a file.
@@ -36,6 +36,16 @@ public class Ontology {
     public Ontology(String path) throws OWLOntologyCreationException, NotOWL2QLException {
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
         OWLOntology ontology = manager.loadOntologyFromOntologyDocument(new File(path));
+        OWLProfileReport report = new OWL2QLProfile().checkOntology(ontology);
+        if (!report.isInProfile()) {
+            throw new NotOWL2QLException();
+        }
+        this.ontology = ontology;
+        generateClassMap();
+        generatePropertyMap();
+    }
+
+    public Ontology(OWLOntology ontology) throws OWLOntologyCreationException, NotOWL2QLException {
         OWLProfileReport report = new OWL2QLProfile().checkOntology(ontology);
         if (!report.isInProfile()) {
             throw new NotOWL2QLException();
@@ -62,7 +72,7 @@ public class Ontology {
      */
     private void generatePropertyMap() {
         this.propertyMap = new HashMap<>();
-        for (OWLProperty p : this.ontology.getObjectPropertiesInSignature()) {
+        for (OWLObjectProperty p : this.ontology.getObjectPropertiesInSignature()) {
             propertyMap.put(p.toStringID().split("#")[1], p);
         }
     }
@@ -73,6 +83,14 @@ public class Ontology {
      */
     public HashMap<String, OWLClass> getClassMap() {
         return classMap;
+    }
+
+    /**
+     * Get the object property map
+     * @return Map of object property names and their OWLObjectProperties
+     */
+    public HashMap<String, OWLObjectProperty> getPropertyMap() {
+        return propertyMap;
     }
 
     /**
