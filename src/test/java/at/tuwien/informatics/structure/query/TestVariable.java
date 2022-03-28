@@ -17,25 +17,12 @@ public class TestVariable {
         Variable v2 = new Variable("x");
 
         assertEquals(v1, v2);
-
-        v1.setBound(false);
-        v2.setBound(false);
-
-        assertEquals(v1, v2);
     }
 
     @Test
     public void testUnequalVariables() {
         Variable v1 = new Variable("x");
         Variable v2 = new Variable("y");
-
-        assertNotEquals(v1, v2);
-
-        v1.setBound(false);
-
-        assertNotEquals(v1, v2);
-
-        v2.setBound(false);
 
         assertNotEquals(v1, v2);
     }
@@ -57,10 +44,6 @@ public class TestVariable {
     @Test
     public void testString() {
         Variable v1 = new Variable("x");
-
-        assertEquals("x", v1.toString());
-
-        v1.setBound(false);
 
         assertEquals("x", v1.toString());
     }

@@ -13,21 +13,21 @@ public class Role implements Atom {
      */
     private final String name;
     /**
-     * The variable on the left.
+     * The term on the left.
      */
-    private final Variable left;
+    private final Term left;
     /**
-     * The variable on the right.
+     * The term on the right.
      */
-    private final Variable right;
+    private final Term right;
 
     /**
      * Initialize a new Role object.
      * @param name The role name.
-     * @param left The left {@link Variable}.
-     * @param right The right {@link Variable}.
+     * @param left The left {@link Term}.
+     * @param right The right {@link Term}.
      */
-    public Role(String name, Variable left, Variable right) {
+    public Role(String name, Term left, Term right) {
         this.name = name;
         this.left = left;
         this.right = right;

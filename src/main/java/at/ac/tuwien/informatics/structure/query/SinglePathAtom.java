@@ -4,10 +4,10 @@ import java.util.Set;
 
 public abstract class SinglePathAtom implements RewritableAtom {
     protected final Set<String> rolenames;
-    protected final Variable left;
-    protected final Variable right;
+    protected final Term left;
+    protected final Term right;
 
-    public SinglePathAtom(Set<String> rolenames, Variable left, Variable right) {
+    public SinglePathAtom(Set<String> rolenames, Term left, Term right) {
         this.rolenames = rolenames;
         this.left = left;
         this.right = right;

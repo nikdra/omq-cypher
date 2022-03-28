@@ -76,6 +76,26 @@ public class TestRewriterImpl {
         RewritableQuery qpp = new RewritableQuery(new HashSet<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
+                                new Variable("x"), new Variable("v3")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                                new Variable("v3"), new Variable("y")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
+                                new Variable("z"), new Variable("v1")),
+                        new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                                new Variable("v1"), new Variable("v2")),
+                        new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
+                                new Variable("v2"), new Variable("y"))
+                )));
+
+        assertEquals(qpp, qp);
+    }
+
+    @Test
+    public void testTau() {
+        // input query q(x) :- (r|s)(x, v1), r*(v1, y), (r|s)*(z,v2), r*(v2, v3), r(v3, y), A(u).
+        RewritableQuery q = new RewritableQuery(new HashSet<>(Collections.singleton(new Variable("x"))),
+                new HashSet<>(Arrays.asList(
+                        new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
                                 new Variable("x"), new Variable("v1")),
                         new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
                                 new Variable("v1"), new Variable("y")),
@@ -84,9 +104,12 @@ public class TestRewriterImpl {
                         new ArbitraryLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
                                 new Variable("v2"), new Variable("v3")),
                         new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
-                                new Variable("v3"), new Variable("y"))
+                                new Variable("v3"), new Variable("y")),
+                        new Conceptname("A", new Variable("u"))
                 )));
-
-        assertEquals(qpp, qp);
+        // should become q(x):-(r|s)(x, v1),r*(v1, y),(r|s)*(_,v2),r*(v2, v3),r(v3, y), A(_).
+        // we can't check equality because all unbound variables are different unless they're the same object
+        // (by definition). However, we can check the query string.
+        System.out.println(q);
     }
 }

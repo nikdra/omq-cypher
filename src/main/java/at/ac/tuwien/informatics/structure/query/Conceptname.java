@@ -13,18 +13,18 @@ public class Conceptname implements RewritableAtom {
      */
     private final String name;
     /**
-     * The variable in the atom.
+     * The term in the atom.
      */
-    private final Variable variable;
+    private final Term term;
 
     /**
      * Initialize a new Conceptname object.
      * @param name The name of the concept.
-     * @param variable The {@link Variable} in the atom.
+     * @param term The {@link Term} in the atom.
      */
-    public Conceptname(String name, Variable variable) {
+    public Conceptname(String name, Term term) {
         this.name = name;
-        this.variable = variable;
+        this.term = term;
     }
 
     @Override
@@ -38,20 +38,20 @@ public class Conceptname implements RewritableAtom {
 
         Conceptname c = (Conceptname) obj;
 
-        return this.name.equals(c.name) && this.variable.equals(c.variable);
+        return this.name.equals(c.name) && this.term.equals(c.term);
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
         hash = 53 * hash + (this.name != null ? this.name.hashCode() : 0);
-        hash = 53 * hash + (this.variable != null ? this.variable.hashCode() : 0);
+        hash = 53 * hash + (this.term != null ? this.term.hashCode() : 0);
         return hash;
     }
 
     @Override
     public String toString() {
-        return this.name + '(' + this.variable.toString() + ')';
+        return this.name + '(' + this.term.toString() + ')';
     }
 
     /**

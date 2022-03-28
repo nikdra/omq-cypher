@@ -65,5 +65,5 @@ public abstract class PathElement {
                 .collect(Collectors.toSet());
     }
 
-    public abstract SinglePathAtom toSinglePathAtom(Variable left, Variable right);
+    public abstract SinglePathAtom toSinglePathAtom(Term left, Term right);
 }

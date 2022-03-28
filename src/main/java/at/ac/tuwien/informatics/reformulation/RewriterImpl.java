@@ -81,7 +81,7 @@ public class RewriterImpl implements Rewriter {
                 // get elements and split into single path atoms
                 List<PathElement> elements = b.getElements();
                 Iterator<PathElement> it = elements.listIterator();
-                Variable left = b.getLeft();
+                Term left = b.getLeft();
                 PathElement element = it.next();
                 while(it.hasNext()) {
                     Variable right = new Variable("v" + ++variable_counter);
@@ -97,13 +97,6 @@ public class RewriterImpl implements Rewriter {
         return new RewritableQuery(head, body);
     }
 
-    private RewritableQuery splitPaths(RewritableQuery q) {
-        // for each path, split it up
-        // use counter to add new bound variables
-        // unbound variables will be denoted '_' by tau
-        return q;
-    }
-
     /**
      * Given a Xi-restricted query q, mark all unbound variables as such.
      *
@@ -112,7 +105,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery tau(RewritableQuery q) {
-        return null;
+        return q;
     }
 
     /**
@@ -126,7 +119,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery concatenate(RewritableQuery q, SinglePathAtom a1, SinglePathAtom a2) {
-        return null;
+        return q;
     }
 
     /**
@@ -140,7 +133,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery merge(RewritableQuery q, SinglePathAtom a1, SinglePathAtom a2) {
-        return null;
+        return q;
     }
 
     /**
@@ -153,7 +146,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery drop(RewritableQuery q, ArbitraryLengthSinglePathAtom a) {
-        return null;
+        return q;
     }
 
     /**
@@ -167,7 +160,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery reduce(RewritableQuery q, RewritableAtom a1, RewritableAtom a2) {
-        return null;
+        return q;
     }
 
     /**
@@ -180,6 +173,6 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery replace(RewritableQuery q, RewritableAtom a, OWLAxiom I) {
-        return null;
+        return q;
     }
 }

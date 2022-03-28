@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class ArbitraryLengthSinglePathAtom extends SinglePathAtom {
 
-    public ArbitraryLengthSinglePathAtom(Set<String> rolenames, Variable left, Variable right) {
+    public ArbitraryLengthSinglePathAtom(Set<String> rolenames, Term left, Term right) {
         super(rolenames, left, right);
     }
 

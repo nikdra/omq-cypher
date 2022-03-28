@@ -13,19 +13,19 @@ import java.util.stream.Collectors;
 public class Path implements Atom {
 
     /**
-     * The variable on the left.
+     * The term on the left.
      */
-    private final Variable left;
+    private final Term left;
     /**
-     * The variable on the right.
+     * The term on the right.
      */
-    private final Variable right;
+    private final Term right;
     /**
      * The elements of the path.
      */
     private final List<PathElement> elements;
 
-    public Path(List<PathElement> elements, Variable left, Variable right) {
+    public Path(List<PathElement> elements, Term left, Term right) {
         this.elements = elements;
         this.left = left;
         this.right = right;
@@ -69,11 +69,11 @@ public class Path implements Atom {
         return elements;
     }
 
-    public Variable getLeft() {
+    public Term getLeft() {
         return left;
     }
 
-    public Variable getRight() {
-        return right;
+    public Term getRight() {
+            return right;
     }
 }

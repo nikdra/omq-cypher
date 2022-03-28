@@ -39,7 +39,7 @@ public class ArbitraryLengthPathElement extends PathElement {
     }
 
     @Override
-    public SinglePathAtom toSinglePathAtom(Variable left, Variable right) {
+    public SinglePathAtom toSinglePathAtom(Term left, Term right) {
         return new ArbitraryLengthSinglePathAtom(this.rolenames, left, right);
     }
 }
