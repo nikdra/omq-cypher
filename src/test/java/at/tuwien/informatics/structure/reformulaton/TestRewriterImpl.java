@@ -19,7 +19,7 @@ public class TestRewriterImpl {
         // load ontology
         File resourcesDirectory = new File("src/test/resources/subroles.owl");
 
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         List<PathElement> elements = new LinkedList<>();
@@ -35,7 +35,7 @@ public class TestRewriterImpl {
         RewritableQuery qp = rewriter.saturatePaths(q, new Ontology(resourcesDirectory.getAbsolutePath()));
 
         // check if results are as expected
-        RewritableQuery qpp = new RewritableQuery(new HashSet<>(Collections.singleton(new Variable("x"))),
+        RewritableQuery qpp = new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
                                 new Variable("x"), new Variable("v1")),
@@ -51,7 +51,7 @@ public class TestRewriterImpl {
         // load ontology
         File resourcesDirectory = new File("src/test/resources/subroles.owl");
 
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         List<PathElement> elements = new LinkedList<>();
@@ -73,7 +73,7 @@ public class TestRewriterImpl {
         RewritableQuery qp = rewriter.saturatePaths(q, new Ontology(resourcesDirectory.getAbsolutePath()));
 
         // check if results are as expected
-        RewritableQuery qpp = new RewritableQuery(new HashSet<>(Collections.singleton(new Variable("x"))),
+        RewritableQuery qpp = new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
                                 new Variable("x"), new Variable("v3")),
@@ -93,7 +93,7 @@ public class TestRewriterImpl {
     @Test
     public void testTau() {
         // input query q(x) :- (r|s)(x, v1), r*(v1, y), (r|s)*(z,v2), r*(v2, v3), r(v3, y), A(u).
-        RewritableQuery q = new RewritableQuery(new HashSet<>(Collections.singleton(new Variable("x"))),
+        RewritableQuery q = new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new SingleLengthSinglePathAtom(new HashSet<>(Arrays.asList("r", "s")),
                                 new Variable("x"), new Variable("v1")),

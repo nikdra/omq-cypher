@@ -24,7 +24,7 @@ public class TestInputInputQueryBuilder {
 
         InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Conceptname("Pizza", new Variable("x")));
@@ -44,7 +44,7 @@ public class TestInputInputQueryBuilder {
 
         InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Conceptname("Pizza", new Variable("x")));
@@ -65,7 +65,7 @@ public class TestInputInputQueryBuilder {
 
         InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Role("hasIngredient", new Variable("x"), new Variable("y")));
@@ -85,7 +85,7 @@ public class TestInputInputQueryBuilder {
 
         InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         head.add(new Variable("y"));
 
@@ -107,7 +107,7 @@ public class TestInputInputQueryBuilder {
 
         InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Conceptname("Pizza", new Variable("x")));
@@ -127,7 +127,7 @@ public class TestInputInputQueryBuilder {
 
         InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Conceptname("Pizza", new Variable("x")));
@@ -148,7 +148,7 @@ public class TestInputInputQueryBuilder {
 
         InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
 
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
         body.add(new Conceptname("emergency_vehicle", new Variable("x")));
@@ -167,7 +167,7 @@ public class TestInputInputQueryBuilder {
         ParseTree tree = parser.query();
 
         InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
 
@@ -192,7 +192,7 @@ public class TestInputInputQueryBuilder {
         ParseTree tree = parser.query();
 
         InputQuery q = (InputQuery) new InputQueryBuilder().visit(tree);
-        HashSet<Variable> head = new HashSet<>();
+        List<Variable> head = new LinkedList<>();
         head.add(new Variable("x"));
         HashSet<Atom> body = new HashSet<>();
 

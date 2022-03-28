@@ -93,7 +93,7 @@ public class RewriterImpl implements Rewriter {
             }
         }
 
-        Set<Variable> head = new HashSet<>(q.getHead());
+        List<Variable> head = new LinkedList<>(q.getHead());
         return new RewritableQuery(head, body);
     }
 

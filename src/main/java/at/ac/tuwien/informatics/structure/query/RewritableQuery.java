@@ -1,5 +1,6 @@
 package at.ac.tuwien.informatics.structure.query;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -10,7 +11,7 @@ public class RewritableQuery implements Query {
     /**
      * The set of answer variables in the head.
      */
-    private final Set<Variable> head;
+    private final List<Variable> head;
     /**
      * The set of atoms in the body.
      */
@@ -22,7 +23,7 @@ public class RewritableQuery implements Query {
      * @param head A set of answer {@link Variable}.
      * @param body A set of atoms {@link RewritableAtom}
      */
-    public RewritableQuery(Set<Variable> head, Set<RewritableAtom> body) {
+    public RewritableQuery(List<Variable> head, Set<RewritableAtom> body) {
         this.head = head;
         this.body = body;
     }
@@ -58,7 +59,7 @@ public class RewritableQuery implements Query {
                 this.body.stream().map(RewritableAtom::toString).collect(Collectors.joining(","));
     }
 
-    public Set<Variable> getHead() {
+    public List<Variable> getHead() {
         return head;
     }
 
