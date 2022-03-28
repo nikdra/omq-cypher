@@ -131,5 +131,15 @@ public class TestRewriterImpl {
         RewritableQuery qp = rewriter.tau(q);
 
         assertEquals("q():-s(_,_)", qp.toString());
+
+        // input query q():-s*(x,y)
+        q = new RewritableQuery(new LinkedList<>(),
+                new HashSet<>(Collections.singleton(new ArbitraryLengthSinglePathAtom(Collections.singleton("s"),
+                        new Variable("x"), new Variable("y")))));
+
+        // call rewriter
+        qp = rewriter.tau(q);
+
+        assertEquals("q():-s*(_,_)", qp.toString());
     }
 }
