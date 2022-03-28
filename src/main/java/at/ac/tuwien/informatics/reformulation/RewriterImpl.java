@@ -47,7 +47,6 @@ public class RewriterImpl implements Rewriter {
                 // TODO path rewritings
             }
         }
-
         return Qp;
     }
 
@@ -98,6 +97,7 @@ public class RewriterImpl implements Rewriter {
 
     /**
      * Given a Xi-restricted query q, mark all unbound variables as such.
+     * Unbound variables are denoted by {@link UnboundVariable} objects.
      *
      * @param q The input query
      * @return A Xi-restricted query q.

@@ -63,6 +63,6 @@ public class SingleLengthSinglePathAtom extends SinglePathAtom {
 
     @Override
     public SinglePathAtom replaceTerms(Term left, Term right) {
-        return new SingleLengthSinglePathAtom(new HashSet<>(this.rolenames), this.left, this.right);
+        return new SingleLengthSinglePathAtom(new HashSet<>(this.rolenames), left, right);
     }
 }

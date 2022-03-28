@@ -118,4 +118,18 @@ public class TestRewriterImpl {
         System.out.println(q);
         System.out.println(qp);
     }
+
+    @Test
+    public void testTauBoolean() {
+        // input query q():-s(x,y)
+        RewritableQuery q = new RewritableQuery(new LinkedList<>(),
+                new HashSet<>(Collections.singleton(new SingleLengthSinglePathAtom(Collections.singleton("s"),
+                        new Variable("x"), new Variable("y")))));
+
+        // call rewriter
+        RewriterImpl rewriter = new RewriterImpl();
+        RewritableQuery qp = rewriter.tau(q);
+
+        assertEquals("q():-s(_,_)", qp.toString());
+    }
 }
