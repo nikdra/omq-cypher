@@ -61,10 +61,18 @@ public class InputQuery implements Query {
                 this.body.stream().map(Atom::toString).collect(Collectors.joining(","));
     }
 
+    /**
+     * Get the head of this query.
+     * @return The list of variables in the head.
+     */
     public List<Variable> getHead() {
         return head;
     }
 
+    /**
+     * Get the body of this query.
+     * @return The set of atoms in the body.
+     */
     public Set<Atom> getBody() {
         return body;
     }

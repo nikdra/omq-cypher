@@ -45,16 +45,6 @@ public class Ontology {
         generatePropertyMap();
     }
 
-    public Ontology(OWLOntology ontology) throws OWLOntologyCreationException, NotOWL2QLException {
-        OWLProfileReport report = new OWL2QLProfile().checkOntology(ontology);
-        if (!report.isInProfile()) {
-            throw new NotOWL2QLException();
-        }
-        this.ontology = ontology;
-        generateClassMap();
-        generatePropertyMap();
-    }
-
     /**
      * Generate a map "A" -> ...#A (as OWLClass) from the ontology's signature.
      */

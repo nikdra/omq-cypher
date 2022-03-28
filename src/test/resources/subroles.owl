@@ -19,7 +19,7 @@
      -->
 
 
-    <!-- http://www.co-ode.org/ontologies/testont.owl#r -->
+    <!-- http://www.co-ode.org/ontologies/testont.owl#t -->
 
 
         <owl:ObjectProperty rdf:about="http://www.co-ode.org/ontologies/testont.owl#t">

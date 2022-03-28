@@ -61,6 +61,13 @@ public class ArbitraryLengthSinglePathAtom extends SinglePathAtom {
         return super.toString() + "*(" + this.left.toString() +"," + this.right.toString() + ")";
     }
 
+    /**
+     * Create a new arbitrary length single path atom with the given terms.
+     *
+     * @param left The left {@link Term}.
+     * @param right The right {@link Term}.
+     * @return A new arbitrary length single path atom, that can be rewritten.
+     */
     @Override
     public SinglePathAtom replaceTerms(Term left, Term right) {
         return new ArbitraryLengthSinglePathAtom(new HashSet<>(this.rolenames), left, right);

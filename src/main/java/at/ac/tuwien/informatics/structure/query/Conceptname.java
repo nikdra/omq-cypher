@@ -79,10 +79,18 @@ public class Conceptname implements RewritableAtom {
         return null;
     }
 
+    /**
+     * Get the Term of the concept name atom.
+     * @return The term of this atom.
+     */
     public Term getTerm() {
         return term;
     }
 
+    /**
+     * Get the name of the concept in this atom.
+     * @return The name of this atom.
+     */
     public String getName() {
         return name;
     }

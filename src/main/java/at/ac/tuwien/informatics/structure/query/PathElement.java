@@ -45,6 +45,12 @@ public abstract class PathElement {
         }
     }
 
+    /**
+     * Exhaustively apply the subrole axiom to this path element.
+     * This means adding each implied subrole of each role in the set of rolenames to the set of rolenames.
+     *
+     * @param o The ontology.
+     */
     public void saturate(Ontology o) {
         Set<OWLObjectPropertyExpression> subroles = new HashSet<>();
         // get the object property object for each role in this path element
@@ -65,5 +71,12 @@ public abstract class PathElement {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Convert this path element to a single path atom.
+     *
+     * @param left The left {@link Term}.
+     * @param right The right {@link Term}.
+     * @return This path element as a rewritable single path atom.
+     */
     public abstract SinglePathAtom toSinglePathAtom(Term left, Term right);
 }

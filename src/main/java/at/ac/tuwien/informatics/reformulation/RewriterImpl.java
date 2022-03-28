@@ -74,9 +74,9 @@ public class RewriterImpl implements Rewriter {
             }
             else { // Path
                 Path b = (Path) a;
-                // saturate
+                // saturate each element of the path
                 b.saturate(o);
-                // get elements and split into single path atoms
+                // get elements and split into single path atoms, add each to the query
                 List<PathElement> elements = b.getElements();
                 Iterator<PathElement> it = elements.listIterator();
                 Term left = b.getLeft();
@@ -148,18 +148,19 @@ public class RewriterImpl implements Rewriter {
                 if (b.getLeft() instanceof Variable) {
                     if ((variableCount.get((Variable) b.getLeft()) == 1) &&
                             !q.getHead().contains((Variable) b.getLeft())) { // unbound variable
-                        left = new UnboundVariable();
+                        left = new UnboundVariable(); // replace term
                     }
                 }
                 if (b.getRight() instanceof Variable) {
                     if ((variableCount.get((Variable) b.getRight()) == 1) &&
                             !q.getHead().contains((Variable) b.getRight())) { // unbound variable
-                        right = new UnboundVariable();
+                        right = new UnboundVariable(); // replace term
                     }
                 }
                 body.add(b.replaceTerms(left, right));
             }
         }
+        // return query with unbound variables marked as such
         return new RewritableQuery(new LinkedList<>(q.getHead()), body);
     }
 

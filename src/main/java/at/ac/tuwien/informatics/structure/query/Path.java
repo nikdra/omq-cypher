@@ -61,18 +61,35 @@ public class Path implements Atom {
                 "(" + this.left.toString() + "," + this.right.toString() + ")";
     }
 
+    /**
+     * Saturate each element of the path by exhaustively applying the subrole axioms for each role in the set of role
+     * names in the element.
+     * @param o The ontology.
+     */
     public void saturate(Ontology o) {
         elements.forEach(e -> e.saturate(o));
     }
 
+    /**
+     * Get the list of elements in this path.
+     * @return The list of path elements.
+     */
     public List<PathElement> getElements() {
         return elements;
     }
 
+    /**
+     * Get the Term on the left.
+     * @return The Term on the left.
+     */
     public Term getLeft() {
         return left;
     }
 
+    /**
+     * Get the Term on the right.
+     * @return The Term on the right.
+     */
     public Term getRight() {
             return right;
     }
