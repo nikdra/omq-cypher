@@ -75,6 +75,12 @@ public class SingleLengthSinglePathAtom extends SinglePathAtom {
         return new SingleLengthSinglePathAtom(new HashSet<>(this.rolenames), left, right);
     }
 
+    /**
+     * Apply a list of substitutions to the terms of this atom.
+     *
+     * @param substitutions A list of substitutions.
+     * @return A new SingleLengthSinglePathAtom with the substitutions applied to its terms.
+     */
     @Override
     public SingleLengthSinglePathAtom applySubstitution(List<Substitution> substitutions) {
         Term left = this.left.getFresh();

@@ -31,5 +31,11 @@ public interface RewritableAtom extends Atom {
      */
     RewritableAtom apply(Ontology o, OWLAxiom a);
 
+    /**
+     * Apply a list of substitutions to the terms of an atom.
+     *
+     * @param substitutions A list of substitutions.
+     * @return A new RewritableAtom with the substitutions applied to its terms.
+     */
     RewritableAtom applySubstitution(List<Substitution> substitutions);
 }

@@ -98,8 +98,14 @@ public class Conceptname implements RewritableAtom {
         return name;
     }
 
+    /**
+     * Apply a list of substitutions to the terms of this atom.
+     *
+     * @param substitutions A list of substitutions.
+     * @return A new Conceptname with the substitutions applied to its terms.
+     */
     @Override
-    public RewritableAtom applySubstitution(List<Substitution> substitutions) {
+    public Conceptname applySubstitution(List<Substitution> substitutions) {
         Term t = this.term.getFresh();
         for (Substitution sub : substitutions) {
             t = t.applySubstitution(sub);

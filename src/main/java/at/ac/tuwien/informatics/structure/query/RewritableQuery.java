@@ -59,10 +59,20 @@ public class RewritableQuery implements Query {
                 this.body.stream().map(RewritableAtom::toString).collect(Collectors.joining(","));
     }
 
+    /**
+     * Get the head of the query.
+     *
+     * @return List of variables in the head.
+     */
     public List<Variable> getHead() {
         return head;
     }
 
+    /**
+     * Get the body of the query.
+     *
+     * @return List of atoms in the body.
+     */
     public Set<RewritableAtom> getBody() {
         return body;
     }

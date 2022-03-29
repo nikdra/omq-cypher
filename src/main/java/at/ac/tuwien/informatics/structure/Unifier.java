@@ -28,6 +28,9 @@ public class Unifier {
         most_general_unifier();
     }
 
+    /**
+     * Compute the most general unifier of the list of substitutions.
+     */
     private void most_general_unifier() {
         boolean action = true;
         while (action) {
@@ -68,6 +71,12 @@ public class Unifier {
         }
     }
 
+    /**
+     * Apply a set of substitutions to the head and body of the query.
+     *
+     * @param q The input query.
+     * @return A query q' where the substitutions have been applied to the query.
+     */
     public RewritableQuery apply(RewritableQuery q) {
         if (this.substitutions.size() == 0) {
             return q;
@@ -91,6 +100,11 @@ public class Unifier {
         return new RewritableQuery(head, body);
     }
 
+    /**
+     * Get the list of substitutions from this unifier.
+     *
+     * @return List of Substitutions.
+     */
     public List<Substitution> getSubstitutions() {
         return substitutions;
     }

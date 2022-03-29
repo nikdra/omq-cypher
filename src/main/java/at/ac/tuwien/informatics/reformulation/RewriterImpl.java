@@ -13,6 +13,8 @@ import java.util.*;
  */
 public class RewriterImpl implements Rewriter {
 
+    private int variable_counter = 0;
+
     /**
      * Given a Xi-restricted query q, rewrite q into a set of queries such that the evaluation over the data returns
      * all the certain answers in the KB.
@@ -64,7 +66,6 @@ public class RewriterImpl implements Rewriter {
         // iterate over atoms, apply role inclusion if it's a path atom and split
         // transform roles into single length single path atoms
         // otherwise, just add to query
-        int variable_counter = 0;
         Set<RewritableAtom> body = new HashSet<>();
         for (Atom a : q.getBody()) {
             if (a instanceof Conceptname) { // Concept name

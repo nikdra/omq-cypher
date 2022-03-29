@@ -42,19 +42,35 @@ public class UnboundVariable implements Term {
         return hash;
     }
 
+    /**
+     * Apply a substitution to this unbound variable.
+     *
+     * @param s The substitution to be applied
+     * @return A new Term with the substitution applied.
+     */
     @Override
     public Term applySubstitution(Substitution s) {
         if (s.getIn().equals(this)) {
-            return new UnboundVariable(s.getOut().getName());
+            return s.getOut().getFresh();
         }
         return new UnboundVariable(this.name);
     }
 
+    /**
+     * Get the name of this unbound variable.
+     *
+     * @return The name of this unbound variable.
+     */
     @Override
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Get a fresh Unbound Variable that is equal to this Unbound Variable.
+     *
+     * @return This Unbound Variable as a new object.
+     */
     @Override
     public Term getFresh() {
         return new UnboundVariable(this.name);

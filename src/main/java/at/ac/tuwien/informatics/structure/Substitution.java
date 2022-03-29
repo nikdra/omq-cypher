@@ -2,6 +2,9 @@ package at.ac.tuwien.informatics.structure;
 
 import at.ac.tuwien.informatics.structure.query.Term;
 
+/**
+ * A class that represents a single substitution of terms.
+ */
 public class Substitution {
     private Term in;
     private Term out;

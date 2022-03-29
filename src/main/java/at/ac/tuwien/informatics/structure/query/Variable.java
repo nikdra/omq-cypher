@@ -47,6 +47,12 @@ public class Variable implements Term {
         return this.name;
     }
 
+    /**
+     * Apply a substitution to this variable.
+     *
+     * @param s The substitution to be applied
+     * @return A new Term with the substitution applied.
+     */
     @Override
     public Term applySubstitution(Substitution s) {
         if (s.getIn().equals(this)) {
@@ -55,11 +61,21 @@ public class Variable implements Term {
         return new Variable(this.name);
     }
 
+    /**
+     * Get the name of this variable.
+     *
+     * @return The name of this variable.
+     */
     @Override
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Get a fresh Variable that is equal to this Variable.
+     *
+     * @return This Variable as a new object.
+     */
     @Override
     public Variable getFresh() {
         return new Variable(this.name);
