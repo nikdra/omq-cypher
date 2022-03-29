@@ -35,8 +35,8 @@ public class RewriterImpl implements Rewriter {
                 // (a) apply axioms, if possible
                 for (RewritableAtom a: qp.getBody()) {
                     for (OWLAxiom I: o.getOntology().getAxioms()) {
-                        if (a.applicable(o, I)) {
-                            Q.add(replace(qp, a, I));
+                        if(a.applicable(o, I)) {
+                            Q.add(replace(qp, a, o, I));
                         }
                     }
                 }
@@ -250,15 +250,26 @@ public class RewriterImpl implements Rewriter {
     }
 
     /**
-     * Replace atom in query
+     * Replace atom in query.
+     * Assumes that the axiom is applicable to the atom.
      *
      * @param q Xi-restricted query.
      * @param a A rewritable atom in the query.
+     * @param o The ontology wrapper object.
      * @param I An OWL QL (DL-Lite) Axiom
      * @return A Xi-restricted query q'.
      */
     @Override
-    public RewritableQuery replace(RewritableQuery q, RewritableAtom a, OWLAxiom I) {
-        return q;
+    public RewritableQuery replace(RewritableQuery q, RewritableAtom a, Ontology o, OWLAxiom I) {
+        List<Variable> head = new LinkedList<>(q.getHead());
+        Set<RewritableAtom> body = new HashSet<>(q.getBody());
+        body.remove(a);
+        body.add(a.apply(o, I, this));
+        return new RewritableQuery(head, body);
+    }
+
+    @Override
+    public String getFreshVariableName() {
+        return "v" + ++this.variable_counter;
     }
 }

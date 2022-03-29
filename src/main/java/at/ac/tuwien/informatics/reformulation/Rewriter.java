@@ -87,8 +87,11 @@ public interface Rewriter {
      *
      * @param q Xi-restricted query.
      * @param a A rewritable atom in the query.
+     * @param o The ontology wrapper object.
      * @param I An OWL QL (DL-Lite) Axiom
      * @return A Xi-restricted query q'.
      */
-    RewritableQuery replace(RewritableQuery q, RewritableAtom a, OWLAxiom I);
+    RewritableQuery replace(RewritableQuery q, RewritableAtom a, Ontology o, OWLAxiom I);
+
+    String getFreshVariableName();
 }

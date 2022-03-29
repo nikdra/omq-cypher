@@ -1,5 +1,6 @@
 package at.ac.tuwien.informatics.structure.query;
 
+import at.ac.tuwien.informatics.reformulation.Rewriter;
 import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.Substitution;
 import org.semanticweb.owlapi.model.OWLAxiom;
@@ -29,7 +30,7 @@ public interface RewritableAtom extends Atom {
      * @param a The axiom to be applied.
      * @return The new atom.
      */
-    RewritableAtom apply(Ontology o, OWLAxiom a);
+    RewritableAtom apply(Ontology o, OWLAxiom a, Rewriter rewriter);
 
     /**
      * Apply a list of substitutions to the terms of an atom.
