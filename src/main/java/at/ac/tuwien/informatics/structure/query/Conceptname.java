@@ -94,18 +94,18 @@ public class Conceptname implements RewritableAtom {
         if (a instanceof OWLSubClassOfAxiom) {
             OWLSubClassOfAxiom b = (OWLSubClassOfAxiom) a;
             OWLClassExpression subclass = b.getSubClass();
-            String subclassname = ((OWLClass) subclass).toStringID().split("#")[1];
+            String subclassname = ((OWLClass) subclass).getIRI().getFragment();
             return new Conceptname(subclassname, this.term.getFresh());
         }
         // domain/range axiom
         UnboundVariable v = new UnboundVariable(rewriter.getFreshVariableName());
         if (a instanceof OWLObjectPropertyRangeAxiom) {
             OWLObjectPropertyExpression subproperty = ((OWLObjectPropertyRangeAxiom) a).getProperty();
-            String rolename = subproperty.getNamedProperty().toStringID().split("#")[1];
+            String rolename = subproperty.getNamedProperty().getIRI().getFragment();
             return new SingleLengthSinglePathAtom(Collections.singleton(rolename), v, this.term.getFresh());
         } else {
             OWLObjectPropertyExpression subproperty = ((OWLObjectPropertyDomainAxiom) a).getProperty();
-            String rolename = subproperty.getNamedProperty().toStringID().split("#")[1];
+            String rolename = subproperty.getNamedProperty().getIRI().getFragment();
             return new SingleLengthSinglePathAtom(Collections.singleton(rolename), this.term.getFresh(), v);
         }
     }

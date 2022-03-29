@@ -36,4 +36,25 @@ public class TestOntology {
         h.add(o.getClassMap().get("AssistantProf"));
         assertEquals(subclasses, h);
     }
+
+    @Test
+    public void testSubClassOfWithFoaf() throws OWLOntologyCreationException, NotOWL2QLException {
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/university2.ttl");
+
+        HashSet<OWLClassExpression> subclasses = new HashSet<>();
+
+        for (OWLAxiom a : o.getOntology().getAxioms()) {
+            if (a instanceof OWLSubClassOfAxiom) {
+                if(((OWLSubClassOfAxiom) a).getSuperClass() == o.getClassMap().get("Person")) {
+                    subclasses.add(((OWLSubClassOfAxiom) a).getSubClass());
+                }
+            }
+        }
+
+        HashSet<OWLClass> h = new HashSet<>();
+        h.add(o.getClassMap().get("Student"));
+        h.add(o.getClassMap().get("FacultyMember"));
+        assertEquals(subclasses, h);
+    }
 }

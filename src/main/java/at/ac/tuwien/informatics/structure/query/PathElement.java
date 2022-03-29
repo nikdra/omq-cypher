@@ -67,7 +67,7 @@ public abstract class PathElement {
             }
         }
         this.rolenames = subroles.stream()
-                .map(p -> ((OWLObjectProperty) p).toStringID().split("#")[1])
+                .map(p -> ((OWLObjectProperty) p).getIRI().getFragment())
                 .collect(Collectors.toSet());
     }
 
