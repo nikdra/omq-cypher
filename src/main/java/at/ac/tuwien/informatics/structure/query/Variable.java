@@ -1,5 +1,7 @@
 package at.ac.tuwien.informatics.structure.query;
 
+import at.ac.tuwien.informatics.structure.Substitution;
+
 /**
  * A class that represents a variable in the query.
  */
@@ -43,5 +45,23 @@ public class Variable implements Term {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    @Override
+    public Term applySubstitution(Substitution s) {
+        if (s.getIn().equals(this)) {
+            return s.getOut().getFresh();
+        }
+        return new Variable(this.name);
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public Variable getFresh() {
+        return new Variable(this.name);
     }
 }

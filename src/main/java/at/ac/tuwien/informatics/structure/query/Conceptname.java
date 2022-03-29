@@ -1,7 +1,10 @@
 package at.ac.tuwien.informatics.structure.query;
 
 import at.ac.tuwien.informatics.structure.Ontology;
+import at.ac.tuwien.informatics.structure.Substitution;
 import org.semanticweb.owlapi.model.OWLAxiom;
+
+import java.util.List;
 
 /**
  * A class that represents a query atom of the form A(_) for a concept name A.
@@ -93,5 +96,14 @@ public class Conceptname implements RewritableAtom {
      */
     public String getName() {
         return name;
+    }
+
+    @Override
+    public RewritableAtom applySubstitution(List<Substitution> substitutions) {
+        Term t = this.term.getFresh();
+        for (Substitution sub : substitutions) {
+            t = t.applySubstitution(sub);
+        }
+        return new Conceptname(this.name, t);
     }
 }

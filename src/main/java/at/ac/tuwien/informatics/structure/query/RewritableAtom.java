@@ -1,7 +1,10 @@
 package at.ac.tuwien.informatics.structure.query;
 
 import at.ac.tuwien.informatics.structure.Ontology;
+import at.ac.tuwien.informatics.structure.Substitution;
 import org.semanticweb.owlapi.model.OWLAxiom;
+
+import java.util.List;
 
 /**
  * An interface that represents a rewritable atom in the query body.
@@ -27,4 +30,6 @@ public interface RewritableAtom extends Atom {
      * @return The new atom.
      */
     RewritableAtom apply(Ontology o, OWLAxiom a);
+
+    RewritableAtom applySubstitution(List<Substitution> substitutions);
 }
