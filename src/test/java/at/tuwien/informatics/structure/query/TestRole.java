@@ -1,9 +1,6 @@
 package at.tuwien.informatics.structure.query;
 
-import at.ac.tuwien.informatics.structure.query.Atom;
-import at.ac.tuwien.informatics.structure.query.Role;
-import at.ac.tuwien.informatics.structure.query.SingleLengthSinglePathAtom;
-import at.ac.tuwien.informatics.structure.query.Variable;
+import at.ac.tuwien.informatics.structure.query.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -32,6 +29,11 @@ public class TestRole {
 
         r1 = new Role("r", new Variable("x"), new Variable("y"));
         r2 = new Role("r", new Variable("x"), new Variable("z"));
+
+        assertNotEquals(r1, r2);
+
+        r1 = new Role("r", new Variable("x"), new UnboundVariable("z"));
+        r2 = new Role("r", new Variable("x"), new UnboundVariable("y"));
 
         assertNotEquals(r1, r2);
     }

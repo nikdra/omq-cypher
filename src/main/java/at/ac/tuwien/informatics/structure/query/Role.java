@@ -62,6 +62,11 @@ public class Role implements Atom {
         return this.name + '(' + this.left.toString() + ',' + this.right.toString() + ')';
     }
 
+    /**
+     * Transform this Role atom into a SingleLengthSinglePathAtom.
+     *
+     * @return Role as SingleLengthSinglePathAtom.
+     */
     public SingleLengthSinglePathAtom toSingleLengthSinglePathAtom() {
         return new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton(this.name)), this.left, this.right);
     }

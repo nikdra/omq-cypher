@@ -67,4 +67,13 @@ public abstract class SinglePathAtom implements RewritableAtom {
      * @return A new arbitrary length single path atom, that can be rewritten.
      */
     public abstract SinglePathAtom replaceTerms(Term left, Term right);
+
+    /**
+     * Get the role names of this atom.
+     *
+     * @return Set of role names.
+     */
+    public Set<String> getRolenames() {
+        return rolenames;
+    }
 }

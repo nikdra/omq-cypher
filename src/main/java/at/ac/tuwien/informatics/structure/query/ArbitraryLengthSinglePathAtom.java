@@ -1,9 +1,11 @@
 package at.ac.tuwien.informatics.structure.query;
 
 import at.ac.tuwien.informatics.structure.Ontology;
+import at.ac.tuwien.informatics.structure.Substitution;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -70,6 +72,24 @@ public class ArbitraryLengthSinglePathAtom extends SinglePathAtom {
      */
     @Override
     public SinglePathAtom replaceTerms(Term left, Term right) {
+        return new ArbitraryLengthSinglePathAtom(new HashSet<>(this.rolenames), left, right);
+    }
+
+    /**
+     * Apply a list of substitutions to the terms of this atom.
+     *
+     * @param substitutions A list of substitutions.
+     * @return A new ArbitraryLengthSinglePathAtom with the substitutions applied to its terms.
+     */
+    @Override
+    public ArbitraryLengthSinglePathAtom applySubstitution(List<Substitution> substitutions) {
+        Term left = this.left.getFresh();
+        Term right = this.right.getFresh();
+
+        for (Substitution sub : substitutions) {
+            left = left.applySubstitution(sub);
+            right = right.applySubstitution(sub);
+        }
         return new ArbitraryLengthSinglePathAtom(new HashSet<>(this.rolenames), left, right);
     }
 }

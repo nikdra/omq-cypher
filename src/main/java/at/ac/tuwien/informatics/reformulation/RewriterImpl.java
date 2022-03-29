@@ -1,23 +1,26 @@
 package at.ac.tuwien.informatics.reformulation;
 
 import at.ac.tuwien.informatics.structure.Ontology;
+import at.ac.tuwien.informatics.structure.Unifier;
 import at.ac.tuwien.informatics.structure.query.*;
-import com.google.errorprone.annotations.Var;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
 import java.util.*;
 
 /**
  * An implementation of a rewriter for XI-restricted queries.
+ * The assumption for all methods is that the query is Xi-restricted, and the TBox is Xi-compliant.
  */
 public class RewriterImpl implements Rewriter {
+
+    private int variable_counter = 0;
 
     /**
      * Given a Xi-restricted query q, rewrite q into a set of queries such that the evaluation over the data returns
      * all the certain answers in the KB.
      *
      * @param q The input query.
-     * @param o The ontology.
+     * @param o The Xi-compliant ontology.
      * @return Set of queries.
      */
     @Override
@@ -55,7 +58,7 @@ public class RewriterImpl implements Rewriter {
      * Then, split multi-element path atoms into single path atoms.
      *
      * @param q The input query.
-     * @param o The ontology.
+     * @param o The Xi-compliant ontology.
      * @return A Xi-restricted query q.
      */
     @Override
@@ -63,7 +66,6 @@ public class RewriterImpl implements Rewriter {
         // iterate over atoms, apply role inclusion if it's a path atom and split
         // transform roles into single length single path atoms
         // otherwise, just add to query
-        int variable_counter = 0;
         Set<RewritableAtom> body = new HashSet<>();
         for (Atom a : q.getBody()) {
             if (a instanceof Conceptname) { // Concept name
@@ -79,7 +81,7 @@ public class RewriterImpl implements Rewriter {
                 // get elements and split into single path atoms, add each to the query
                 List<PathElement> elements = b.getElements();
                 Iterator<PathElement> it = elements.listIterator();
-                Term left = b.getLeft();
+                Term left = b.getLeft().getFresh();
                 PathElement element = it.next();
                 while(it.hasNext()) {
                     Variable right = new Variable("v" + ++variable_counter);
@@ -87,7 +89,7 @@ public class RewriterImpl implements Rewriter {
                     element = it.next();
                     left = new Variable("v" + variable_counter);
                 }
-                body.add(element.toSinglePathAtom(left, b.getRight()));
+                body.add(element.toSinglePathAtom(left, b.getRight().getFresh()));
             }
         }
 
@@ -132,29 +134,29 @@ public class RewriterImpl implements Rewriter {
         for (RewritableAtom a : q.getBody()) {
             if (a instanceof Conceptname) { // concept name
                 Conceptname b = (Conceptname) a;
-                Term t = b.getTerm();
+                Term t = b.getTerm().getFresh();
                 if (b.getTerm() instanceof Variable) {  // contains variable
                     if ((variableCount.get((Variable) b.getTerm()) == 1) &&
                             !q.getHead().contains((Variable) b.getTerm())) { // unbound variable
-                        t = new UnboundVariable();  // replace term
+                        t = new UnboundVariable(b.getTerm().getName());  // replace term
                     }
                 }
                 body.add(new Conceptname(b.getName(), t)); // add to new query
             }
             if (a instanceof SinglePathAtom) { // single path atom - includes roles
                 SinglePathAtom b = (SinglePathAtom) a;
-                Term left = b.getLeft();
-                Term right = b.getRight();
+                Term left = b.getLeft().getFresh();
+                Term right = b.getRight().getFresh();
                 if (b.getLeft() instanceof Variable) {
                     if ((variableCount.get((Variable) b.getLeft()) == 1) &&
                             !q.getHead().contains((Variable) b.getLeft())) { // unbound variable
-                        left = new UnboundVariable(); // replace term
+                        left = new UnboundVariable(b.getLeft().getName()); // replace term
                     }
                 }
                 if (b.getRight() instanceof Variable) {
                     if ((variableCount.get((Variable) b.getRight()) == 1) &&
                             !q.getHead().contains((Variable) b.getRight())) { // unbound variable
-                        right = new UnboundVariable(); // replace term
+                        right = new UnboundVariable(b.getRight().getName()); // replace term
                     }
                 }
                 body.add(b.replaceTerms(left, right));
@@ -216,6 +218,34 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery reduce(RewritableQuery q, RewritableAtom a1, RewritableAtom a2) {
+        if (a1 instanceof Conceptname && a2 instanceof Conceptname) {
+            Conceptname b1 = (Conceptname) a1;
+            Conceptname b2 = (Conceptname) a2;
+            if (b1.getName().equals(b2.getName())) {
+                // compute unifier, return result of applying the unifier to q
+                Unifier unifier = new Unifier(Collections.singletonList(b1.getTerm().getFresh()),
+                        Collections.singletonList(b2.getTerm().getFresh()));
+                return unifier.apply(q);
+            }
+        } else if (a1 instanceof SingleLengthSinglePathAtom && a2 instanceof SingleLengthSinglePathAtom) {
+            SingleLengthSinglePathAtom b1 = (SingleLengthSinglePathAtom) a1;
+            SingleLengthSinglePathAtom b2 = (SingleLengthSinglePathAtom) a2;
+            if (b1.getRolenames().equals(b2.getRolenames())) {
+                // compute unifier, return result of applying the unifier to q
+                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft().getFresh(), b1.getRight().getFresh()),
+                        Arrays.asList(b2.getLeft().getFresh(), b2.getRight().getFresh()));
+                return unifier.apply(q);
+            }
+        } else if (a1 instanceof ArbitraryLengthSinglePathAtom && a2 instanceof ArbitraryLengthSinglePathAtom) {
+            ArbitraryLengthSinglePathAtom b1 = (ArbitraryLengthSinglePathAtom) a1;
+            ArbitraryLengthSinglePathAtom b2 = (ArbitraryLengthSinglePathAtom) a2;
+            if (b1.getRolenames().equals(b2.getRolenames())) {
+                // compute unifier, return result of applying the unifier to q
+                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft().getFresh(), b1.getRight().getFresh()),
+                        Arrays.asList(b2.getLeft().getFresh(), b2.getRight().getFresh()));
+                return unifier.apply(q);
+            }
+        }
         return q;
     }
 

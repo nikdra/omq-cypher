@@ -2,6 +2,7 @@ package at.tuwien.informatics.structure.query;
 
 import at.ac.tuwien.informatics.structure.query.Atom;
 import at.ac.tuwien.informatics.structure.query.Conceptname;
+import at.ac.tuwien.informatics.structure.query.UnboundVariable;
 import at.ac.tuwien.informatics.structure.query.Variable;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +31,11 @@ public class TestConceptname {
 
         c1 = new Conceptname("A", new Variable("x"));
         c2 = new Conceptname("A", new Variable("y"));
+
+        assertNotEquals(c1, c2);
+
+        c1 = new Conceptname("A", new UnboundVariable("x"));
+        c2 = new Conceptname("A", new UnboundVariable("y"));
 
         assertNotEquals(c1, c2);
     }

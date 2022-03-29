@@ -1,4 +1,4 @@
-package at.tuwien.informatics.structure.reformulaton;
+package at.tuwien.informatics.reformulaton;
 
 import at.ac.tuwien.informatics.reformulation.RewriterImpl;
 import at.ac.tuwien.informatics.structure.Ontology;
@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestRewriterImpl {
 
@@ -141,5 +142,32 @@ public class TestRewriterImpl {
         qp = rewriter.tau(q);
 
         assertEquals("q():-s*(_,_)", qp.toString());
+    }
+
+    @Test
+    public void testReduce() {
+        RewriterImpl rewriter = new RewriterImpl();
+        RewritableQuery qp;
+        Set<RewritableQuery> Q;
+
+        // input query q(x,y):-s(x,y)
+        // nothing to replace, mgu is empty
+        RewritableQuery q = new RewritableQuery(new LinkedList<>(Arrays.asList(new Variable("x"),
+                new Variable("y"))),
+                new HashSet<>(Collections.singleton(new SingleLengthSinglePathAtom(Collections.singleton("s"),
+                        new Variable("x"), new Variable("y")))));
+
+        Q = new HashSet<>(Collections.singleton(q));
+
+        for (RewritableAtom a1: q.getBody()) {
+            for (RewritableAtom a2 : q.getBody()) {
+                Q.add(rewriter.tau(rewriter.reduce(q, a1, a2)));
+            }
+        }
+        assertTrue(Q.contains(new RewritableQuery(new LinkedList<>(Arrays.asList(new Variable("x"),
+                new Variable("y"))),
+                new HashSet<>(Collections.singleton(new SingleLengthSinglePathAtom(Collections.singleton("s"),
+                        new Variable("x"), new Variable("y")))))));
+        assertEquals(1, Q.size());
     }
 }
