@@ -3,11 +3,12 @@ package at.ac.tuwien.informatics.structure.query;
 import at.ac.tuwien.informatics.reformulation.Rewriter;
 import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.Substitution;
-import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.*;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A class representing a single path atom (r \cup ...)(x,y) of single length.
@@ -25,8 +26,63 @@ public class SingleLengthSinglePathAtom extends SinglePathAtom {
      * @param a The axiom to be applied.
      * @return True if the axiom is applicable, false otherwise.
      */
-    @Override
     public boolean applicable(Ontology o, OWLAxiom a) {
+        // get the object property object for each role in this path element
+        // note: all the object properties occurring in the query must be in the ontology signature
+        Set<OWLObjectPropertyExpression> roles = this.rolenames.stream().map(r ->
+                o.getPropertyMap().get(r)).collect(Collectors.toSet());
+        // sub-property axiom and this atom contains the super role
+        if (a instanceof OWLSubObjectPropertyOfAxiom) {
+            OWLSubObjectPropertyOfAxiom b = (OWLSubObjectPropertyOfAxiom) a;
+            OWLObjectPropertyExpression role = b.getSuperProperty();
+            return roles.contains(role.getNamedProperty());
+        }
+        // inverses
+        if (a instanceof OWLInverseObjectPropertiesAxiom) {
+            return (roles.contains(((OWLInverseObjectPropertiesAxiom) a).getFirstProperty())
+                    || roles.contains(((OWLInverseObjectPropertiesAxiom) a).getSecondProperty()));
+        }
+        // range
+        if (a instanceof OWLObjectPropertyRangeAxiom) {
+            OWLObjectPropertyRangeAxiom b = (OWLObjectPropertyRangeAxiom) a;
+            if (b.getRange() instanceof OWLObjectSomeValuesFrom) {
+                OWLObjectPropertyExpression role = ((OWLObjectSomeValuesFrom) b.getRange()).getProperty();
+                if (roles.contains(role.getNamedProperty())) {
+                    if (role instanceof OWLObjectInverseOf) { // exists r_1^- ISA exists r^-
+                        return this.left instanceof UnboundVariable;
+                    } // exists r_1^- ISA exists r
+                    return this.right instanceof UnboundVariable;
+                }
+            }
+            return false;
+        }
+        // domain
+        if (a instanceof OWLObjectPropertyDomainAxiom) {
+            OWLObjectPropertyDomainAxiom b = (OWLObjectPropertyDomainAxiom) a;
+            if (b.getDomain() instanceof OWLObjectSomeValuesFrom) {
+                OWLObjectPropertyExpression role = ((OWLObjectSomeValuesFrom) b.getDomain()).getProperty();
+                if (roles.contains(role.getNamedProperty())) {
+                    if (role instanceof OWLObjectInverseOf) { // exists r_1 ISA exists r^-
+                        return this.left instanceof UnboundVariable;
+                    } // exists r_1 ISA exists r
+                    return this.right instanceof UnboundVariable;
+                }
+            }
+            return false;
+        }
+        // subclass of
+        if (a instanceof OWLSubClassOfAxiom) {
+            OWLSubClassOfAxiom b = (OWLSubClassOfAxiom) a;
+            if (b.getSuperClass() instanceof OWLObjectSomeValuesFrom) {
+                OWLObjectPropertyExpression role = ((OWLObjectSomeValuesFrom) b.getSuperClass()).getProperty();
+                if (roles.contains(role.getNamedProperty())) {
+                    if (role instanceof OWLObjectInverseOf) { // A ISA exists r^-
+                        return this.left instanceof UnboundVariable;
+                    } // A ISA exists r
+                    return this.right instanceof UnboundVariable;
+                }
+            }
+        }
         return false;
     }
 
@@ -39,7 +95,6 @@ public class SingleLengthSinglePathAtom extends SinglePathAtom {
      * @param a The axiom to be applied.
      * @return The new atom.
      */
-    @Override
     public RewritableAtom apply(Ontology o, OWLAxiom a, Rewriter rewriter) {
         return null;
     }
@@ -82,7 +137,6 @@ public class SingleLengthSinglePathAtom extends SinglePathAtom {
      * @param substitutions A list of substitutions.
      * @return A new SingleLengthSinglePathAtom with the substitutions applied to its terms.
      */
-    @Override
     public SingleLengthSinglePathAtom applySubstitution(List<Substitution> substitutions) {
         Term left = this.left.getFresh();
         Term right = this.right.getFresh();

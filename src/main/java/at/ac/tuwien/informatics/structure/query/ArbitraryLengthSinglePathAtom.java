@@ -20,25 +20,27 @@ public class ArbitraryLengthSinglePathAtom extends SinglePathAtom {
 
     /**
      * Return true if the atom can be replaced by another atom given an axiom.
+     * For this type of atom, no rewriting rule is applicable!
+     * Hence, this function always returns false.
      *
      * @param a The axiom to be applied.
      * @return True if the axiom is applicable, false otherwise.
      */
-    @Override
-    public boolean applicable(Ontology o, OWLAxiom a) {
+    public boolean applicable(OWLAxiom a) {
         return false;
     }
 
     /**
      * Apply a replacement by an axiom on this atom and return the new atom.
-     * <p>
+     * For this type of atom, no rewriting rule is applicable!
+     * Hence, this function does not do anything.
+     *
      * Precondition for correctness: applicable was called before.
      *
      * @param a The axiom to be applied.
      * @return The new atom.
      */
-    @Override
-    public RewritableAtom apply(Ontology o, OWLAxiom a, Rewriter rewriter) {
+    public RewritableAtom apply(OWLAxiom a, Rewriter rewriter) {
         return null;
     }
 
@@ -80,7 +82,6 @@ public class ArbitraryLengthSinglePathAtom extends SinglePathAtom {
      * @param substitutions A list of substitutions.
      * @return A new ArbitraryLengthSinglePathAtom with the substitutions applied to its terms.
      */
-    @Override
     public ArbitraryLengthSinglePathAtom applySubstitution(List<Substitution> substitutions) {
         Term left = this.left.getFresh();
         Term right = this.right.getFresh();

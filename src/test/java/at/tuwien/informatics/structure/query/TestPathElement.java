@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class TestPathElement {
-
+/*
     @Test
     public void testEqualPathElements() {
         PathElement p1 = new SingleLengthPathElement(new HashSet<>(Collections.singleton("r")));
@@ -80,4 +80,6 @@ public class TestPathElement {
 
         assertEquals(p1, p2);
     }
+
+ */
 }

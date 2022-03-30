@@ -54,7 +54,7 @@ public abstract class PathElement {
     public void saturate(Ontology o) {
         Set<OWLObjectPropertyExpression> subroles = new HashSet<>();
         // get the object property object for each role in this path element
-        // note: all the object properties occuring in the query must be in the ontology signature
+        // note: all the object properties occurring in the query must be in the ontology signature
         Set<OWLObjectPropertyExpression> roles = this.rolenames.stream().map(r ->
                 o.getPropertyMap().get(r)).collect(Collectors.toSet());
         // exhaustively apply the subrole axioms

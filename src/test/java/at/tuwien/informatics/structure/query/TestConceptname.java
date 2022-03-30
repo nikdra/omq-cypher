@@ -21,35 +21,41 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class TestConceptname {
 
     @Test
-    public void testEqualConceptnames() {
-        Conceptname c1 = new Conceptname("A", new Variable("x"));
-        Conceptname c2 = new Conceptname("A", new Variable("x"));
+    public void testEqualConceptnames() throws OWLOntologyCreationException, NotOWL2QLException {
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/university.owl");
+        Conceptname c1 = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
+        Conceptname c2 = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
 
         assertEquals(c1, c2);
     }
 
     @Test
-    public void testUnequalConcepts() {
-        Conceptname c1 = new Conceptname("A", new Variable("x"));
-        Conceptname c2 = new Conceptname("B", new Variable("x"));
+    public void testUnequalConcepts() throws OWLOntologyCreationException, NotOWL2QLException {
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/university.owl");
+        Conceptname c1 = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
+        Conceptname c2 = new Conceptname(o.getClassMap().get("Student"), new Variable("x"));
 
         assertNotEquals(c1, c2);
 
-        c1 = new Conceptname("A", new Variable("x"));
-        c2 = new Conceptname("A", new Variable("y"));
+        c1 = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
+        c2 = new Conceptname(o.getClassMap().get("Professor"), new Variable("y"));
 
         assertNotEquals(c1, c2);
 
-        c1 = new Conceptname("A", new UnboundVariable("x"));
-        c2 = new Conceptname("A", new UnboundVariable("y"));
+        c1 = new Conceptname(o.getClassMap().get("Professor"), new UnboundVariable("x"));
+        c2 = new Conceptname(o.getClassMap().get("Professor"), new UnboundVariable("y"));
 
         assertNotEquals(c1, c2);
     }
 
     @Test
-    public void testSetOfEqualConcepts() {
-        Conceptname c1 = new Conceptname("A", new Variable("x"));
-        Conceptname c2 = new Conceptname("A", new Variable("x"));
+    public void testSetOfEqualConcepts() throws OWLOntologyCreationException, NotOWL2QLException {
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/university.owl");
+        Conceptname c1 = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
+        Conceptname c2 = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
 
         assertEquals(c1, c2);
 
@@ -57,16 +63,18 @@ public class TestConceptname {
         HashSet<Atom> set2 = new HashSet<>();
         set2.add(c1);
 
-        assertEquals(set1, set2);
+        assertEquals(set2, set1);
     }
 
     @Test
-    public void testString() {
-        Conceptname c1 = new Conceptname("A", new Variable("x"));
+    public void testString() throws OWLOntologyCreationException, NotOWL2QLException {
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/university.owl");
+        Conceptname c1 = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
 
-        assertEquals(c1.toString(), "A(x)");
+        assertEquals("Professor(x)", c1.toString());
     }
-
+/*
     @Test
     public void testApplicable() throws OWLOntologyCreationException, NotOWL2QLException {
         // load ontology
@@ -121,4 +129,5 @@ public class TestConceptname {
                 new SingleLengthSinglePathAtom(Collections.singleton("teaches"),
                         new UnboundVariable("v2"), new Variable("y")))), rewritten);
     }
+ */
 }

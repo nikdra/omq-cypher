@@ -2,7 +2,7 @@ package at.ac.tuwien.informatics.structure.query;
 
 import java.util.Set;
 
-public abstract class SinglePathAtom implements RewritableAtom {
+public abstract class SinglePathAtom  {
 
     /**
      * The set (disjunction) of role names occurring in this path element.

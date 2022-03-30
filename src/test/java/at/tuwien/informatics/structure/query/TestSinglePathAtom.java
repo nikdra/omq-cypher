@@ -1,17 +1,25 @@
 package at.tuwien.informatics.structure.query;
 
+import at.ac.tuwien.informatics.reformulation.Rewriter;
+import at.ac.tuwien.informatics.structure.Ontology;
+import at.ac.tuwien.informatics.structure.exception.NotOWL2QLException;
 import at.ac.tuwien.informatics.structure.query.*;
+import com.google.errorprone.annotations.Var;
 import org.junit.jupiter.api.Test;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class TestSinglePathAtom {
-
+/*
     @Test
     public void testEqualSinglePathAtoms() {
         SinglePathAtom p1 = new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton("r")),
@@ -123,4 +131,38 @@ public class TestSinglePathAtom {
         assertNotEquals(set1, set2);
         assertEquals(set1.size(), 2);
     }
+
+    @Test
+    public void testApplicable() throws OWLOntologyCreationException, NotOWL2QLException {
+        // load ontology
+        File resourcesDirectory = new File("src/test/resources/university.owl");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath());
+        SinglePathAtom p = new SingleLengthSinglePathAtom(Collections.singleton("teaches"), new Variable("x"),
+                new UnboundVariable("y"));
+
+        Set<OWLAxiom> applicableAxioms = new HashSet<>();
+
+        for (OWLAxiom I: o.getOntology().getAxioms()) {
+            if (p.applicable(o, I)) {
+                applicableAxioms.add(I);
+            }
+        }
+
+        assertEquals(1, applicableAxioms.size());
+
+        // load ontology
+        resourcesDirectory = new File("src/test/resources/university2.ttl");
+        o = new Ontology(resourcesDirectory.getAbsolutePath());
+
+        applicableAxioms = new HashSet<>();
+
+        for (OWLAxiom I: o.getOntology().getAxioms()) {
+            if (p.applicable(o, I)) {
+                applicableAxioms.add(I);
+            }
+        }
+        // inverses!
+        assertEquals(3, applicableAxioms.size());
+    }
+ */
 }

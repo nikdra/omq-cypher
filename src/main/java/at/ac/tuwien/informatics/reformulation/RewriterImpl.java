@@ -28,6 +28,7 @@ public class RewriterImpl implements Rewriter {
         Set<RewritableQuery> Q = new HashSet<>();
         Q.add(tau(saturatePaths(q, o)));
         Set<RewritableQuery> Qp = null;
+        /*
 
         while(!Q.equals(Qp)) {
             Qp = new HashSet<>(Q);
@@ -50,6 +51,7 @@ public class RewriterImpl implements Rewriter {
                 // TODO path rewritings
             }
         }
+         */
         return Qp;
     }
 
@@ -63,6 +65,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery saturatePaths(InputQuery q, Ontology o) {
+        /*
         // iterate over atoms, apply role inclusion if it's a path atom and split
         // transform roles into single length single path atoms
         // otherwise, just add to query
@@ -95,6 +98,8 @@ public class RewriterImpl implements Rewriter {
 
         List<Variable> head = new LinkedList<>(q.getHead());
         return new RewritableQuery(head, body);
+         */
+        return null;
     }
 
     /**
@@ -106,6 +111,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery tau(RewritableQuery q) {
+        /*
         // map of variables and the number of atoms they occur in
         Map<Variable, Integer> variableCount = new HashMap<>();
         // first pass: get number of terms each variable occurs in
@@ -164,6 +170,8 @@ public class RewriterImpl implements Rewriter {
         }
         // return query with unbound variables marked as such
         return new RewritableQuery(new LinkedList<>(q.getHead()), body);
+         */
+        return null;
     }
 
     /**
@@ -197,6 +205,7 @@ public class RewriterImpl implements Rewriter {
     /**
      * Given a Xi-restricted query q, and an arbitrary path atom in q.
      * If the arbitrary length path atom can be dropped, then return the result of dropping it.
+     * Note that the query body can _not_ be empty.
      *
      * @param q Xi-restricted query.
      * @param a An arbitrary length single path atom.
@@ -204,6 +213,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery drop(RewritableQuery q, ArbitraryLengthSinglePathAtom a) {
+        // remember: no empty query body!
         return q;
     }
 
@@ -218,6 +228,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery reduce(RewritableQuery q, RewritableAtom a1, RewritableAtom a2) {
+        /*
         if (a1 instanceof Conceptname && a2 instanceof Conceptname) {
             Conceptname b1 = (Conceptname) a1;
             Conceptname b2 = (Conceptname) a2;
@@ -246,6 +257,7 @@ public class RewriterImpl implements Rewriter {
                 return unifier.apply(q);
             }
         }
+         */
         return q;
     }
 
@@ -261,11 +273,14 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery replace(RewritableQuery q, RewritableAtom a, Ontology o, OWLAxiom I) {
+        /*
         List<Variable> head = new LinkedList<>(q.getHead());
         Set<RewritableAtom> body = new HashSet<>(q.getBody());
         body.remove(a);
         body.add(a.apply(o, I, this));
         return new RewritableQuery(head, body);
+         */
+        return null;
     }
 
     @Override
