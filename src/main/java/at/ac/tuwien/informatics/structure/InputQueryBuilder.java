@@ -4,6 +4,8 @@ import at.ac.tuwien.informatics.generated.QBaseVisitor;
 import at.ac.tuwien.informatics.generated.QParser;
 import at.ac.tuwien.informatics.structure.query.*;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -104,7 +106,8 @@ public class InputQueryBuilder extends QBaseVisitor<Object> {
 
     @Override
     public Object visitRoles(QParser.RolesContext ctx) {
-        return super.visitRoles(ctx);
+        Set<OWLObjectPropertyExpression> properties = (Set<OWLObjectPropertyExpression>) this.visitProperties(ctx.properties());
+        return new Roles(properties, (Variable) this.visitVariable(ctx.left), (Variable) this.visitVariable(ctx.right));
     }
 
     @Override
@@ -134,7 +137,16 @@ public class InputQueryBuilder extends QBaseVisitor<Object> {
 
     @Override
     public Object visitProperties(QParser.PropertiesContext ctx) {
-        return super.visitProperties(ctx);
+        Set<OWLObjectPropertyExpression> properties = new HashSet<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            ParseTree c = ctx.getChild(i);
+            Object result = c.accept(this);
+
+            if (result != null) {
+                properties.add((OWLObjectPropertyExpression) result);
+            }
+        }
+        return properties;
     }
 
     @Override
@@ -144,12 +156,14 @@ public class InputQueryBuilder extends QBaseVisitor<Object> {
 
     @Override
     public Object visitRolename(QParser.RolenameContext ctx) {
-        return super.visitRolename(ctx);
+        return this.ontology.getPropertyMap().get((String) this.visitWords(ctx.words()));
     }
 
     @Override
     public Object visitInverse(QParser.InverseContext ctx) {
-        return super.visitInverse(ctx);
+        return this.ontology.getPropertyMap()
+                .get((String) this.visitWords(ctx.words()))
+                .getInverseProperty();
     }
 
     @Override
