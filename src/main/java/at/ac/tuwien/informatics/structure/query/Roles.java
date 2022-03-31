@@ -107,7 +107,14 @@ public class Roles implements Binary {
      */
     @Override
     public RewritableAtom applySubstitution(List<Substitution> substitutions) {
-        return null;
+        Term left = this.left.getFresh();
+        Term right = this.right.getFresh();
+
+        for (Substitution sub : substitutions) {
+            left = left.applySubstitution(sub);
+            right = right.applySubstitution(sub);
+        }
+        return new Roles(new HashSet<>(this.roles), left, right);
     }
 
     public void saturate(Ontology o) {
@@ -140,8 +147,9 @@ public class Roles implements Binary {
         }
     }
 
+    @Override
     public Set<OWLObjectPropertyExpression> getRoles() {
-        return roles;
+        return this.roles;
     }
 
     @Override
@@ -164,5 +172,12 @@ public class Roles implements Binary {
     @Override
     public Roles replaceTerms(Term left, Term right) {
         return new Roles(new HashSet<>(this.roles), left, right);
+    }
+
+    public Roles getInverse() {
+        Set<OWLObjectPropertyExpression> inverses = this.roles.stream()
+                .map(OWLObjectPropertyExpression::getInverseProperty)
+                .collect(Collectors.toSet());
+        return new Roles(inverses, this.right.getFresh(), this.left.getFresh());
     }
 }

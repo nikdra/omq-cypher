@@ -157,9 +157,13 @@ public class TestRewriterImpl {
 
         assertEquals("q():-s*(_,_)", qp.toString());
     }
-/*
+
     @Test
-    public void testReduce() {
+    public void testReduceSingleAtom() throws OWLOntologyCreationException, NotOWL2QLException {
+        // load ontology
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/subroles.owl");
+
         RewriterImpl rewriter = new RewriterImpl();
         RewritableQuery qp;
         Set<RewritableQuery> Q;
@@ -168,7 +172,7 @@ public class TestRewriterImpl {
         // nothing to replace, mgu is empty
         RewritableQuery q = new RewritableQuery(new LinkedList<>(Arrays.asList(new Variable("x"),
                 new Variable("y"))),
-                new HashSet<>(Collections.singleton(new SingleLengthSinglePathAtom(Collections.singleton("s"),
+                new HashSet<>(Collections.singleton(new Roles(Collections.singleton(o.getPropertyMap().get("s")),
                         new Variable("x"), new Variable("y")))));
 
         Q = new HashSet<>(Collections.singleton(q));
@@ -180,9 +184,58 @@ public class TestRewriterImpl {
         }
         assertTrue(Q.contains(new RewritableQuery(new LinkedList<>(Arrays.asList(new Variable("x"),
                 new Variable("y"))),
-                new HashSet<>(Collections.singleton(new SingleLengthSinglePathAtom(Collections.singleton("s"),
+                new HashSet<>(Collections.singleton(new Roles(Collections.singleton(o.getPropertyMap().get("s")),
                         new Variable("x"), new Variable("y")))))));
         assertEquals(1, Q.size());
     }
-     */
+
+    @Test
+    public void testReduceInverseAtoms() throws OWLOntologyCreationException, NotOWL2QLException {
+        // load ontology
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/subroles.owl");
+
+        RewriterImpl rewriter = new RewriterImpl();
+        RewritableQuery qp;
+        Set<RewritableQuery> Q;
+
+        // input query q(x,y):-(s|r)(x,y), (s-|r-)(y,x)
+        // unifier is both (s-|r)(y,x) and (s|r)(x,y)
+        RewritableQuery q = new RewritableQuery(
+                new LinkedList<>(Arrays.asList(new Variable("x"), new Variable("y"))),
+                new HashSet<>(Arrays.asList(
+                        new Roles(new HashSet<>(Arrays.asList(o.getPropertyMap().get("s"), o.getPropertyMap().get("r"))),
+                                new Variable("x"), new Variable("y")),
+                        new Roles(new HashSet<>(Arrays.asList(o.getPropertyMap().get("s").getInverseProperty(),
+                                o.getPropertyMap().get("r").getInverseProperty())),
+                                new Variable("y"), new Variable("x")))));
+
+        Q = new HashSet<>(Collections.singleton(q));
+
+        for (RewritableAtom a1 : q.getBody()) {
+            for (RewritableAtom a2 : q.getBody()) {
+                Q.add(rewriter.tau(rewriter.reduce(q, a1, a2)));
+            }
+        }
+        assertTrue(Q.contains(new RewritableQuery(new LinkedList<>(Arrays.asList(new Variable("x"),
+                new Variable("y"))),
+                new HashSet<>(Collections.singleton(new Roles(new HashSet<>(Arrays.asList(o.getPropertyMap().get("s"),
+                        o.getPropertyMap().get("r"))),
+                        new Variable("x"), new Variable("y")))))));
+        assertTrue(Q.contains(new RewritableQuery(
+                new LinkedList<>(Arrays.asList(new Variable("x"), new Variable("y"))),
+                new HashSet<>(Arrays.asList(
+                        new Roles(new HashSet<>(Arrays.asList(o.getPropertyMap().get("s"), o.getPropertyMap().get("r"))),
+                                new Variable("x"), new Variable("y")),
+                        new Roles(new HashSet<>(Arrays.asList(o.getPropertyMap().get("s").getInverseProperty(),
+                                o.getPropertyMap().get("r").getInverseProperty())),
+                                new Variable("y"), new Variable("x")))))));
+        assertTrue(Q.contains(new RewritableQuery(
+                new LinkedList<>(Arrays.asList(new Variable("x"), new Variable("y"))),
+                new HashSet<>(Collections.singleton(
+                        new Roles(new HashSet<>(Arrays.asList(o.getPropertyMap().get("s").getInverseProperty(),
+                                o.getPropertyMap().get("r").getInverseProperty())),
+                                new Variable("y"), new Variable("x")))))));
+        assertEquals(3, Q.size());
+    }
 }

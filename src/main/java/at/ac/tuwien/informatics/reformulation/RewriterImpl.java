@@ -1,6 +1,7 @@
 package at.ac.tuwien.informatics.reformulation;
 
 import at.ac.tuwien.informatics.structure.Ontology;
+import at.ac.tuwien.informatics.structure.Unifier;
 import at.ac.tuwien.informatics.structure.query.*;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -224,36 +225,51 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery reduce(RewritableQuery q, RewritableAtom a1, RewritableAtom a2) {
-        /*
         if (a1 instanceof Conceptname && a2 instanceof Conceptname) {
             Conceptname b1 = (Conceptname) a1;
             Conceptname b2 = (Conceptname) a2;
             if (b1.getName().equals(b2.getName())) {
                 // compute unifier, return result of applying the unifier to q
-                Unifier unifier = new Unifier(Collections.singletonList(b1.getTerm().getFresh()),
-                        Collections.singletonList(b2.getTerm().getFresh()));
+                Unifier unifier = new Unifier(Collections.singletonList(b1.getTerm()),
+                        Collections.singletonList(b2.getTerm()));
                 return unifier.apply(q);
             }
-        } else if (a1 instanceof SingleLengthSinglePathAtom && a2 instanceof SingleLengthSinglePathAtom) {
-            SingleLengthSinglePathAtom b1 = (SingleLengthSinglePathAtom) a1;
-            SingleLengthSinglePathAtom b2 = (SingleLengthSinglePathAtom) a2;
-            if (b1.getRolenames().equals(b2.getRolenames())) {
+        } else if (a1 instanceof Roles && a2 instanceof Roles) {
+            Roles b1 = (Roles) a1;
+            Roles b2 = (Roles) a2;
+            if (b1.getRoles().equals(b2.getRoles())) {
                 // compute unifier, return result of applying the unifier to q
-                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft().getFresh(), b1.getRight().getFresh()),
-                        Arrays.asList(b2.getLeft().getFresh(), b2.getRight().getFresh()));
+                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft(), b1.getRight()),
+                        Arrays.asList(b2.getLeft(), b2.getRight()));
                 return unifier.apply(q);
+            } else {
+                // it could be that we can unify once we "invert" one of the role atoms
+                // in this case, inverting means that we switch the left and right variable
+                // and invert all the roles in the set of roles.
+                Roles b3 = b1.getInverse();
+                if (b3.getRoles().equals(b2.getRoles())) {
+                    // create a copy of the query
+                    RewritableQuery qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // remove b1
+                    qp.getBody().remove(b1);
+                    // add b3
+                    qp.getBody().add(b3);
+                    // compute unifier, return result of applying the unifier to q
+                    Unifier unifier = new Unifier(Arrays.asList(b3.getLeft(), b3.getRight()),
+                            Arrays.asList(b2.getLeft(), b2.getRight()));
+                    return unifier.apply(qp);
+                }
             }
-        } else if (a1 instanceof ArbitraryLengthSinglePathAtom && a2 instanceof ArbitraryLengthSinglePathAtom) {
-            ArbitraryLengthSinglePathAtom b1 = (ArbitraryLengthSinglePathAtom) a1;
-            ArbitraryLengthSinglePathAtom b2 = (ArbitraryLengthSinglePathAtom) a2;
-            if (b1.getRolenames().equals(b2.getRolenames())) {
+        } else if (a1 instanceof ArbitraryLengthAtom && a2 instanceof ArbitraryLengthAtom) {
+            ArbitraryLengthAtom b1 = (ArbitraryLengthAtom) a1;
+            ArbitraryLengthAtom b2 = (ArbitraryLengthAtom) a2;
+            if (b1.getRoles().equals(b2.getRoles())) {
                 // compute unifier, return result of applying the unifier to q
-                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft().getFresh(), b1.getRight().getFresh()),
-                        Arrays.asList(b2.getLeft().getFresh(), b2.getRight().getFresh()));
+                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft(), b1.getRight()),
+                        Arrays.asList(b2.getLeft(), b2.getRight()));
                 return unifier.apply(q);
             }
         }
-         */
         return q;
     }
 

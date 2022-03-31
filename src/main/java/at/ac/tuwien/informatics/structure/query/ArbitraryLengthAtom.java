@@ -142,4 +142,9 @@ public class ArbitraryLengthAtom implements Binary {
     public Term getRight() {
         return this.right.getFresh();
     }
+
+    @Override
+    public Set<OWLObjectPropertyExpression> getRoles() {
+        return this.roles;
+    }
 }

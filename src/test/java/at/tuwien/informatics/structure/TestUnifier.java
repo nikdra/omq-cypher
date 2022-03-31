@@ -1,16 +1,20 @@
 package at.tuwien.informatics.structure;
 
+import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.Substitution;
 import at.ac.tuwien.informatics.structure.Unifier;
+import at.ac.tuwien.informatics.structure.exception.NotOWL2QLException;
 import at.ac.tuwien.informatics.structure.query.*;
 import org.junit.jupiter.api.Test;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
+import java.io.File;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestUnifier {
-/*
+
     @Test
     public void testUnifier() {
         List<Term> t1 = Collections.singletonList(new Variable("x"));
@@ -68,7 +72,11 @@ public class TestUnifier {
     }
 
     @Test
-    public void testApplyUnifier() {
+    public void testApplyUnifier() throws OWLOntologyCreationException, NotOWL2QLException {
+        // load ontology
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/subroles.owl");
+
         RewritableQuery q;
         RewritableQuery qp;
         List<Variable> head;
@@ -78,11 +86,11 @@ public class TestUnifier {
         head = new LinkedList<>(Arrays.asList(new Variable("x"), new Variable("y"),
                 new Variable("z")));
         body = new HashSet<>(Arrays.asList(
-                new SingleLengthSinglePathAtom(Collections.singleton("r"),
+                new Roles(Collections.singleton(o.getPropertyMap().get("r")),
                         new Variable("x"), new Variable("y")),
-                new SingleLengthSinglePathAtom(Collections.singleton("r"),
+                new Roles(Collections.singleton(o.getPropertyMap().get("r")),
                         new Variable("y"), new Variable("z")),
-                new Conceptname("A", new Variable("z"))
+                new Conceptname(o.getClassMap().get("A"), new Variable("z"))
                 ));
         q = new RewritableQuery(head, body);
 
@@ -91,22 +99,20 @@ public class TestUnifier {
 
         qp = new RewritableQuery(new LinkedList<>(Arrays.asList(new Variable("z"), new Variable("z"),
                 new Variable("z"))),
-                new HashSet<>(Arrays.asList(new SingleLengthSinglePathAtom(Collections.singleton("r"),
+                new HashSet<>(Arrays.asList(new Roles(Collections.singleton(o.getPropertyMap().get("r")),
                         new Variable("z"), new Variable("z")),
-                        new Conceptname("A", new Variable("z")))));
+                        new Conceptname(o.getClassMap().get("A"), new Variable("z")))));
         // test unifier correctly applied
         assertEquals(qp, unifier.apply(q));
         // test no side effects on the initial query
         assertEquals(new RewritableQuery(new LinkedList<>(Arrays.asList(new Variable("x"), new Variable("y"),
                 new Variable("z"))),
                 new HashSet<>(Arrays.asList(
-                        new SingleLengthSinglePathAtom(Collections.singleton("r"),
+                        new Roles(Collections.singleton(o.getPropertyMap().get("r")),
                                 new Variable("x"), new Variable("y")),
-                        new SingleLengthSinglePathAtom(Collections.singleton("r"),
+                        new Roles(Collections.singleton(o.getPropertyMap().get("r")),
                                 new Variable("y"), new Variable("z")),
-                        new Conceptname("A", new Variable("z"))
+                        new Conceptname(o.getClassMap().get("A"), new Variable("z"))
                 ))), q);
     }
-
- */
 }

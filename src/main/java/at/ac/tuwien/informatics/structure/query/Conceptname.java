@@ -116,7 +116,7 @@ public class Conceptname implements RewritableAtom {
      * @return The term of this atom.
      */
     public Term getTerm() {
-        return term;
+        return this.term.getFresh();
     }
 
     /**

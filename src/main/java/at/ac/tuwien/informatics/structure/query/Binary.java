@@ -11,4 +11,6 @@ public interface Binary extends RewritableAtom {
     Term getRight();
 
     Binary replaceTerms(Term left, Term right);
+
+    Set<OWLObjectPropertyExpression> getRoles();
 }
