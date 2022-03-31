@@ -1,6 +1,7 @@
 package at.ac.tuwien.informatics.structure.query;
 
 import at.ac.tuwien.informatics.structure.Ontology;
+import org.semanticweb.owlapi.model.OWLObjectInverseOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLSubObjectPropertyOfAxiom;
@@ -18,31 +19,30 @@ public abstract class PathElement {
     /**
      * The set (disjunction) of role names occurring in this path element.
      */
-    protected Set<String> rolenames;
+    protected Set<OWLObjectPropertyExpression> roles;
 
     /**
      * Initialize a new path element.
      *
-     * @param rolenames the set (disjunction) of role names occuring in this path element.
+     * @param roles the set (disjunction) of role names occuring in this path element.
      */
-    public PathElement(Set<String> rolenames) {
-        this.rolenames = rolenames;
+    public PathElement(Set<OWLObjectPropertyExpression> roles) {
+        this.roles = roles;
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 53 * hash + (this.rolenames != null ? this.rolenames.hashCode() : 0);
+        hash = 53 * hash + (this.roles != null ? this.roles.hashCode() : 0);
         return hash;
     }
 
     @Override
     public String toString() {
-        if (this.rolenames.size() == 1) {
-            return this.rolenames.iterator().next();
-        } else {
-            return "(" + String.join("|", this.rolenames) + ")";
-        }
+        return this.roles
+                .stream()
+                .map(p -> p.getNamedProperty().getIRI().getFragment() + ((p instanceof OWLObjectInverseOf) ? "-" : ""))
+                .collect(Collectors.joining("|"));
     }
 
     /**
@@ -55,20 +55,18 @@ public abstract class PathElement {
         Set<OWLObjectPropertyExpression> subroles = new HashSet<>();
         // get the object property object for each role in this path element
         // note: all the object properties occurring in the query must be in the ontology signature
-        Set<OWLObjectPropertyExpression> roles = this.rolenames.stream().map(r ->
-                o.getPropertyMap().get(r)).collect(Collectors.toSet());
+        // Set<OWLObjectPropertyExpression> roles = this.roles.stream().map(r -> o.getPropertyMap().get(r)).collect(Collectors.toSet());
         // exhaustively apply the subrole axioms
-        while (!subroles.equals(roles)) {
-            subroles = new HashSet<>(roles);
+        while (!subroles.equals(this.roles)) {
+            subroles = new HashSet<>(this.roles);
             // iterate over all the axioms for the roles that have r on the right side
             for (OWLObjectPropertyExpression r : subroles) {
                 Set<OWLSubObjectPropertyOfAxiom> ax = o.getOntology().getObjectSubPropertyAxiomsForSuperProperty(r);
-                roles.addAll(ax.stream().map(OWLSubObjectPropertyOfAxiom::getSubProperty).collect(Collectors.toSet()));
+                this.roles.addAll(ax.stream().map(OWLSubObjectPropertyOfAxiom::getSubProperty).collect(Collectors.toSet()));
             }
+            // TODO inverses
         }
-        this.rolenames = subroles.stream()
-                .map(p -> ((OWLObjectProperty) p).getIRI().getFragment())
-                .collect(Collectors.toSet());
+        this.roles = subroles;
     }
 
     /**

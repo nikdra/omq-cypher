@@ -33,7 +33,7 @@ public class TestOntology {
         }
 
         HashSet<OWLClass> h = new HashSet<>();
-        h.add(o.getClassMap().get("AssistantProf"));
+        h.add(o.getClassMap().get("Assistant_Prof"));
         assertEquals(subclasses, h);
     }
 

@@ -15,8 +15,16 @@ import java.util.stream.Collectors;
  */
 public class InputQueryBuilder extends QBaseVisitor<Object> {
 
+    /**
+     * The ontology to be used with this query.
+     */
     private final Ontology ontology;
 
+    /**
+     * Initialize a new query parser.
+     *
+     * @param ontology The ontology to be used with this query.
+     */
     public InputQueryBuilder(Ontology ontology){
         this.ontology = ontology;
     }
@@ -25,7 +33,7 @@ public class InputQueryBuilder extends QBaseVisitor<Object> {
      * Visit the query. This is the entry point to our parser.
      * Returns a query with head and body.
      *
-     * @param ctx The query context of the parser
+     * @param ctx The query context of the parser.
      * @return {@link InputQuery}.
      */
     @Override
@@ -104,37 +112,109 @@ public class InputQueryBuilder extends QBaseVisitor<Object> {
                 (Variable) this.visit(ctx.variable()));
     }
 
+    /**
+     * Visit a roles atom and return a Role object with the roles (disjunction) and the variables.
+     *
+     * @param ctx The role context of the parser.
+     * @return {@link Roles}.
+     */
     @Override
     public Object visitRoles(QParser.RolesContext ctx) {
         Set<OWLObjectPropertyExpression> properties = (Set<OWLObjectPropertyExpression>) this.visitProperties(ctx.properties());
         return new Roles(properties, (Variable) this.visitVariable(ctx.left), (Variable) this.visitVariable(ctx.right));
     }
 
+    /**
+     * Visit a path atom and return a path object.
+     * We defined the path as a list of path elements, and two variables.
+     *
+     * @param ctx The path context of the parser.
+     * @return {@link Path}.
+     */
     @Override
     public Object visitPath(QParser.PathContext ctx) {
-        return super.visitPath(ctx);
+        List<PathElement> elements = (List<PathElement>) visit(ctx.elements());
+        return new Path(elements, (Variable) this.visitVariable(ctx.left),
+                (Variable) this.visitVariable(ctx.right));
     }
 
+    /**
+     * Visit a the elements of a path and return a set of path elements.
+     *
+     * @param ctx The Elements context of the parser.
+     * @return List of {@link PathElement}.
+     */
     @Override
     public Object visitElements(QParser.ElementsContext ctx) {
-        return super.visitElements(ctx);
+        List<PathElement> elements = new LinkedList<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            ParseTree c = ctx.getChild(i);
+            Object result = c.accept(this);
+
+            if (result != null) {
+                elements.add((PathElement) result);
+            }
+        }
+        return elements;
     }
 
+    /**
+     * Visit a path element and return a PathElement object, depending on arbitrary length or not.
+     *
+     * @param ctx The PathElement context of the parser.
+     * @return Either {@link ArbitraryLengthPathElement} or {@link SingleLengthPathElement}.
+     */
     @Override
     public Object visitPathElement(QParser.PathElementContext ctx) {
         return super.visitPathElement(ctx);
     }
 
+    /**
+     * Visit an arbitrary-length element of the path and return an ArbitraryLengthPathElement object.
+     *
+     * @param ctx The ArbitraryLengthPathElement context of the parser.
+     * @return {@link ArbitraryLengthPathElement}.
+     */
     @Override
     public Object visitArbitraryLengthPathElement(QParser.ArbitraryLengthPathElementContext ctx) {
-        return super.visitArbitraryLengthPathElement(ctx);
+        Set<OWLObjectPropertyExpression> roles = new HashSet<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            ParseTree c = ctx.getChild(i);
+            Object result = c.accept(this);
+
+            if (result != null) {
+                roles.add((OWLObjectPropertyExpression) result);
+            }
+        }
+        return new ArbitraryLengthPathElement(roles);
     }
 
+    /**
+     * Visit a single-length element of the path and return an SingleLengthPathElement object.
+     *
+     * @param ctx The SingleLengthPathElement context of the parser.
+     * @return {@link SingleLengthPathElement}.
+     */
     @Override
     public Object visitSingleLengthPathElement(QParser.SingleLengthPathElementContext ctx) {
-        return super.visitSingleLengthPathElement(ctx);
+        Set<OWLObjectPropertyExpression> roles = new HashSet<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            ParseTree c = ctx.getChild(i);
+            Object result = c.accept(this);
+
+            if (result != null) {
+                roles.add((OWLObjectPropertyExpression) result);
+            }
+        }
+        return new SingleLengthPathElement(roles);
     }
 
+    /**
+     * Visit a set of properties.
+     *
+     * @param ctx The Properties context of the parser.
+     * @return Set of {@link OWLObjectPropertyExpression}.
+     */
     @Override
     public Object visitProperties(QParser.PropertiesContext ctx) {
         Set<OWLObjectPropertyExpression> properties = new HashSet<>();
@@ -149,16 +229,34 @@ public class InputQueryBuilder extends QBaseVisitor<Object> {
         return properties;
     }
 
+    /**
+     * Visit a property. Can be inverse or not.
+     *
+     * @param ctx The Property context of the parser.
+     * @return {@link OWLObjectPropertyExpression}.
+     */
     @Override
     public Object visitProperty(QParser.PropertyContext ctx) {
         return super.visitProperty(ctx);
     }
 
+    /**
+     * Visit a non-inverse property.
+     *
+     * @param ctx The Rolename context of the parser.
+     * @return {@link OWLObjectPropertyExpression}.
+     */
     @Override
     public Object visitRolename(QParser.RolenameContext ctx) {
         return this.ontology.getPropertyMap().get((String) this.visitWords(ctx.words()));
     }
 
+    /**
+     * Visit an inverse property.
+     *
+     * @param ctx The Inverse context of the parser.
+     * @return {@link OWLObjectPropertyExpression}.
+     */
     @Override
     public Object visitInverse(QParser.InverseContext ctx) {
         return this.ontology.getPropertyMap()
@@ -166,6 +264,12 @@ public class InputQueryBuilder extends QBaseVisitor<Object> {
                 .getInverseProperty();
     }
 
+    /**
+     * Visit words. Return the words as a String.
+     *
+     * @param ctx The Words context of the parser.
+     * @return String representing the words.
+     */
     @Override
     public Object visitWords(QParser.WordsContext ctx) {
         StringBuilder builder = new StringBuilder();

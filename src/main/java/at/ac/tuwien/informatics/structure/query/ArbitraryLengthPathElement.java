@@ -1,5 +1,7 @@
 package at.ac.tuwien.informatics.structure.query;
 
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+
 import java.util.Set;
 
 /**
@@ -10,10 +12,10 @@ public class ArbitraryLengthPathElement extends PathElement {
     /**
      * Initialize a new path element.
      *
-     * @param rolenames the set (disjunction) of role names occuring in this path element.
+     * @param roles the set (disjunction) of role names occuring in this path element.
      */
-    public ArbitraryLengthPathElement(Set<String> rolenames) {
-        super(rolenames);
+    public ArbitraryLengthPathElement(Set<OWLObjectPropertyExpression> roles) {
+        super(roles);
     }
 
     @Override
@@ -28,7 +30,7 @@ public class ArbitraryLengthPathElement extends PathElement {
 
         ArbitraryLengthPathElement a = (ArbitraryLengthPathElement) obj;
 
-        return this.rolenames.equals(a.rolenames);
+        return this.roles.equals(a.roles);
     }
 
     @Override
@@ -45,6 +47,7 @@ public class ArbitraryLengthPathElement extends PathElement {
      */
     @Override
     public SinglePathAtom toSinglePathAtom(Term left, Term right) {
-        return new ArbitraryLengthSinglePathAtom(this.rolenames, left, right);
+        return null;
     }
+
 }

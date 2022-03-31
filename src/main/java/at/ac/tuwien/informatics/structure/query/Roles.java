@@ -22,7 +22,7 @@ public class Roles implements RewritableAtom {
     /**
      * The names of the roles.
      */
-    private final Set<OWLObjectPropertyExpression> name;
+    private final Set<OWLObjectPropertyExpression> roles;
     /**
      * The term on the left.
      */
@@ -34,12 +34,12 @@ public class Roles implements RewritableAtom {
 
     /**
      * Initialize a new Role object.
-     * @param name The role name.
+     * @param roles The roles/properties in this atom.
      * @param left The left {@link Term}.
      * @param right The right {@link Term}.
      */
-    public Roles(Set<OWLObjectPropertyExpression> name, Term left, Term right) {
-        this.name = name;
+    public Roles(Set<OWLObjectPropertyExpression> roles, Term left, Term right) {
+        this.roles = roles;
         this.left = left;
         this.right = right;
     }
@@ -47,7 +47,7 @@ public class Roles implements RewritableAtom {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 53 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 53 * hash + (this.roles != null ? this.roles.hashCode() : 0);
         hash = 53 * hash + (this.left != null ? this.left.hashCode() : 0);
         hash = 53 * hash + (this.right != null ? this.right.hashCode() : 0);
         return hash;
@@ -65,12 +65,12 @@ public class Roles implements RewritableAtom {
 
         Roles r = (Roles) obj;
 
-        return this.name.equals(r.name) && this.left.equals(r.left) && this.right.equals(r.right);
+        return this.roles.equals(r.roles) && this.left.equals(r.left) && this.right.equals(r.right);
     }
 
     @Override
     public String toString() {
-        return '(' + this.name
+        return '(' + this.roles
                 .stream()
                 .map(p -> p.getNamedProperty().getIRI().getFragment() + ((p instanceof OWLObjectInverseOf) ? "-" : ""))
                 .collect(Collectors.joining("|")) + ')' +
