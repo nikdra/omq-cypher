@@ -1,7 +1,6 @@
 package at.ac.tuwien.informatics.reformulation;
 
 import at.ac.tuwien.informatics.structure.Ontology;
-import at.ac.tuwien.informatics.structure.Unifier;
 import at.ac.tuwien.informatics.structure.query.*;
 import org.semanticweb.owlapi.model.OWLAxiom;
 
@@ -65,7 +64,6 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery saturatePaths(InputQuery q, Ontology o) {
-        /*
         // iterate over atoms, apply role inclusion if it's a path atom and split
         // transform roles into single length single path atoms
         // otherwise, just add to query
@@ -74,8 +72,10 @@ public class RewriterImpl implements Rewriter {
             if (a instanceof Conceptname) { // Concept name
                 body.add((Conceptname) a);
             }
-            else if (a instanceof Role) { // Role atom
-                body.add(((Role) a).toSingleLengthSinglePathAtom());  // transform to single length single path atom
+            else if (a instanceof Roles) { // Role atom
+                Roles b = (Roles) a;
+                b.saturate(o); // exhaustively apply subrole/inverse axioms
+                body.add(b);
             }
             else { // Path
                 Path b = (Path) a;
@@ -88,18 +88,16 @@ public class RewriterImpl implements Rewriter {
                 PathElement element = it.next();
                 while(it.hasNext()) {
                     Variable right = new Variable("v" + ++variable_counter);
-                    body.add(element.toSinglePathAtom(left, right));
+                    body.add(element.toBinary(left, right));
                     element = it.next();
                     left = new Variable("v" + variable_counter);
                 }
-                body.add(element.toSinglePathAtom(left, b.getRight().getFresh()));
+                body.add(element.toBinary(left, b.getRight().getFresh()));
             }
         }
 
         List<Variable> head = new LinkedList<>(q.getHead());
         return new RewritableQuery(head, body);
-         */
-        return null;
     }
 
     /**
@@ -111,7 +109,6 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery tau(RewritableQuery q) {
-        /*
         // map of variables and the number of atoms they occur in
         Map<Variable, Integer> variableCount = new HashMap<>();
         // first pass: get number of terms each variable occurs in
@@ -123,8 +120,8 @@ public class RewriterImpl implements Rewriter {
                     variableCount.put((Variable) b.getTerm(), count + 1);
                 }
             }
-            if (a instanceof SinglePathAtom) { // single path atom - includes roles
-                SinglePathAtom b = (SinglePathAtom) a;
+            if (a instanceof Binary) { // single path atom - includes roles
+                Binary b = (Binary) a;
                 if (b.getLeft() instanceof Variable) {
                     Integer count = variableCount.getOrDefault((Variable) b.getLeft(), 0);
                     variableCount.put((Variable) b.getLeft(), count + 1);
@@ -149,8 +146,8 @@ public class RewriterImpl implements Rewriter {
                 }
                 body.add(new Conceptname(b.getName(), t)); // add to new query
             }
-            if (a instanceof SinglePathAtom) { // single path atom - includes roles
-                SinglePathAtom b = (SinglePathAtom) a;
+            if (a instanceof Binary) { // roles, arb.length atoms
+                Binary b = (Binary) a;
                 Term left = b.getLeft().getFresh();
                 Term right = b.getRight().getFresh();
                 if (b.getLeft() instanceof Variable) {
@@ -170,13 +167,26 @@ public class RewriterImpl implements Rewriter {
         }
         // return query with unbound variables marked as such
         return new RewritableQuery(new LinkedList<>(q.getHead()), body);
-         */
+    }
+
+    /**
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of concatenating them.
+     * Precondition: they can be concatenated i.e., they have a nonempty intersection of roles, terms in the correct
+     * places and one of them is of arbitrary length.
+     *
+     * @param q  Xi-restricted query.
+     * @param a1 A binary atom.
+     * @param a2 An arbitrary length atom.
+     * @return A Xi-restricted query q'.
+     */
+    @Override
+    public RewritableQuery concatenate(RewritableQuery q, Binary a1, ArbitraryLengthAtom a2) {
         return null;
     }
 
     /**
-     * Given a Xi-restricted query q, and two path atoms in q, return the result of concatenating them.
-     * Precondition: they can be concatenated.
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of merging them.
+     * Precondition: they can be merged i.e., they have a nonempty intersection of roles.
      *
      * @param q  Xi-restricted query.
      * @param a1 A single path atom.
@@ -184,22 +194,8 @@ public class RewriterImpl implements Rewriter {
      * @return A Xi-restricted query q'.
      */
     @Override
-    public RewritableQuery concatenate(RewritableQuery q, SinglePathAtom a1, SinglePathAtom a2) {
-        return q;
-    }
-
-    /**
-     * Given a Xi-restricted query q, and two path atoms in q, return the result of merging them.
-     * Precondition: they can be merged.
-     *
-     * @param q  Xi-restricted query.
-     * @param a1 A single path atom.
-     * @param a2 A single path atom.
-     * @return A Xi-restricted query q'.
-     */
-    @Override
-    public RewritableQuery merge(RewritableQuery q, SinglePathAtom a1, SinglePathAtom a2) {
-        return q;
+    public RewritableQuery merge(RewritableQuery q, Binary a1, Binary a2) {
+        return null;
     }
 
     /**
@@ -212,7 +208,7 @@ public class RewriterImpl implements Rewriter {
      * @return A Xi-restricted query q'.
      */
     @Override
-    public RewritableQuery drop(RewritableQuery q, ArbitraryLengthSinglePathAtom a) {
+    public RewritableQuery drop(RewritableQuery q, ArbitraryLengthAtom a) {
         // remember: no empty query body!
         return q;
     }

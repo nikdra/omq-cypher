@@ -239,6 +239,5 @@ public class TestInputQueryBuilder {
         InputQuery q1 = new InputQuery(head, body);
 
         assertNotEquals(q, q1);
-
     }
 }

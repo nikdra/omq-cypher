@@ -80,17 +80,18 @@ public class TestPathElement {
 
         assertNotEquals(p1, p2);
     }
-    /*
+
     @Test
     public void testSaturate() throws OWLOntologyCreationException, NotOWL2QLException {
         // load ontology
-        File resourcesDirectory = new File("src/test/resources/subroles.owl");
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/subroles.owl");
 
-        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList("r", "s", "t")));
-        PathElement p2 = new SingleLengthPathElement(new HashSet<>(Collections.singleton("s")));
-        p2.saturate(new Ontology(resourcesDirectory.getAbsolutePath()));
+        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"), o.getPropertyMap().get("t"))));
+        PathElement p2 = new SingleLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("s"))));
+        p2.saturate(o);
 
         assertEquals(p1, p2);
     }
-    */
 }

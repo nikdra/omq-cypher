@@ -2,6 +2,7 @@ package at.ac.tuwien.informatics.structure.query;
 
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -43,10 +44,10 @@ public class SingleLengthPathElement extends PathElement {
      *
      * @param left The left {@link Term}.
      * @param right The right {@link Term}.
-     * @return This path element as a rewritable single path atom.
+     * @return This path element as a rewritable roles atom.
      */
     @Override
-    public SinglePathAtom toSinglePathAtom(Term left, Term right) {
-        return null;
+    public Roles toBinary(Term left, Term right) {
+        return new Roles(new HashSet<>(this.roles), left, right);
     }
 }

@@ -1,23 +1,18 @@
 package at.ac.tuwien.informatics.structure.query;
 
 import at.ac.tuwien.informatics.reformulation.Rewriter;
+import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.Substitution;
-import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLObjectInverseOf;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.*;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * A class that represents a role atom (R \cup ...)(x,y) in the query for some role names "R" (can be inverse!)
  * and variables "x","y".
  */
-public class Roles implements RewritableAtom {
+public class Roles implements Binary {
 
     /**
      * The names of the roles.
@@ -70,21 +65,23 @@ public class Roles implements RewritableAtom {
 
     @Override
     public String toString() {
-        return '(' + this.roles
-                .stream()
+        String rolestring = this.roles.stream()
                 .map(p -> p.getNamedProperty().getIRI().getFragment() + ((p instanceof OWLObjectInverseOf) ? "-" : ""))
-                .collect(Collectors.joining("|")) + ')' +
-                '(' + this.left.toString() + ',' + this.right.toString() + ')';
+                .collect(Collectors.joining("|"));
+        if (this.roles.size() > 1) {
+            rolestring = '(' + rolestring + ')';
+        }
+        return rolestring + '(' + this.left.toString() + "," + this.right.toString() + ')';
     }
 
     /**
      * Return true if the atom can be replaced by another atom given an axiom.
      *
-     * @param a The axiom to be applied.
+     * @param I The axiom to be applied.
      * @return True if the axiom is applicable, false otherwise.
      */
     @Override
-    public boolean applicable(OWLAxiom a) {
+    public boolean applicable(OWLAxiom I) {
         return false;
     }
 
@@ -93,12 +90,12 @@ public class Roles implements RewritableAtom {
      * <p>
      * Precondition for correctness: applicable was called before.
      *
-     * @param a        The axiom to be applied.
+     * @param I The axiom to be applied.
      * @param rewriter
      * @return The new atom.
      */
     @Override
-    public RewritableAtom apply(OWLAxiom a, Rewriter rewriter) {
+    public RewritableAtom apply(OWLAxiom I, Rewriter rewriter) {
         return null;
     }
 
@@ -113,14 +110,59 @@ public class Roles implements RewritableAtom {
         return null;
     }
 
-    /*
-     * Transform this Role atom into a SingleLengthSinglePathAtom.
-     *
-     * @return Role as SingleLengthSinglePathAtom.
-     */
-    /*
-    public SingleLengthSinglePathAtom toSingleLengthSinglePathAtom() {
-        return new SingleLengthSinglePathAtom(new HashSet<>(Collections.singleton(this.name)), this.left, this.right);
+    public void saturate(Ontology o) {
+        Set<OWLObjectPropertyExpression> subroles = new HashSet<>();
+        while (!subroles.equals(this.roles)) {
+            subroles = new HashSet<>(this.roles);
+            // iterate over all the axioms for the roles that have r or r- on the right side
+            for (OWLObjectPropertyExpression r : subroles) {
+                // R1 \ISA R
+                this.roles.addAll(o.getOntology().getObjectSubPropertyAxiomsForSuperProperty(r)
+                        .stream()
+                        .map(OWLSubObjectPropertyOfAxiom::getSubProperty)
+                        .collect(Collectors.toSet()));
+                // R1 \ISA R-
+                this.roles.addAll(o.getOntology().getObjectSubPropertyAxiomsForSuperProperty(r.getInverseProperty())
+                        .stream()
+                        .map(OWLSubObjectPropertyOfAxiom::getSubProperty)
+                        .map(OWLObjectPropertyExpression::getInverseProperty)
+                        .collect(Collectors.toSet()));
+                // inverses
+                // use the named property (in case of inverse), and add the inverse of the inverse in case
+                // r is an inverse itself.
+                this.roles.addAll(o.getOntology().getInverseObjectPropertyAxioms(r.getNamedProperty())
+                        .stream()
+                        .map(p -> p.getPropertiesMinus(r.getNamedProperty()))
+                        .flatMap(Collection::stream)
+                        .map(p -> (r instanceof OWLObjectInverseOf) ? p : p.getInverseProperty())
+                        .collect(Collectors.toSet()));
+            }
+        }
     }
+
+    public Set<OWLObjectPropertyExpression> getRoles() {
+        return roles;
+    }
+
+    @Override
+    public Term getLeft() {
+        return this.left.getFresh();
+    }
+
+    @Override
+    public Term getRight() {
+        return this.right.getFresh();
+    }
+
+    /**
+     * Create a new role atom with the given terms.
+     *
+     * @param left The left {@link Term}.
+     * @param right The right {@link Term}.
+     * @return A new role atom, that can be rewritten.
      */
+    @Override
+    public Roles replaceTerms(Term left, Term right) {
+        return new Roles(new HashSet<>(this.roles), left, right);
+    }
 }
