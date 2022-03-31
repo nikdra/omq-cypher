@@ -82,6 +82,40 @@ public class Roles implements Binary {
      */
     @Override
     public boolean applicable(OWLAxiom I) {
+        if (I instanceof OWLSubClassOfAxiom) {  // A \ISA \exists R
+            OWLSubClassOfAxiom i = (OWLSubClassOfAxiom) I;
+            if (i.getSuperClass() instanceof OWLObjectSomeValuesFrom) {
+                if (this.right instanceof UnboundVariable && // A \ISA \exists R, R(x,_)
+                        this.roles.contains(((OWLObjectSomeValuesFrom) i.getSuperClass()).getProperty()) ) {
+                    return true;
+                }
+                // A \ISA \exists R, R-(_,x)
+                return this.left instanceof UnboundVariable &&
+                        this.roles.contains(((OWLObjectSomeValuesFrom) i.getSuperClass())
+                                .getProperty().getInverseProperty());
+            }
+        } else if (I instanceof OWLObjectPropertyDomainAxiom) { // exists r \ISA \exists R
+            // casting to get the domain and making sure it's \exists R
+            OWLObjectPropertyDomainAxiom i = (OWLObjectPropertyDomainAxiom) I;
+            OWLClassExpression ii = i.getDomain();
+            if (ii instanceof OWLObjectSomeValuesFrom) {
+                OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFrom) ii).getProperty();
+                if (this.right instanceof UnboundVariable && this.roles.contains(property)) {
+                    return true;
+                }
+                return this.left instanceof UnboundVariable && this.roles.contains(property.getInverseProperty());
+            }
+        } else if (I instanceof OWLObjectPropertyRangeAxiom) {
+            OWLObjectPropertyRangeAxiom i = (OWLObjectPropertyRangeAxiom) I;
+            OWLClassExpression ii = i.getRange();
+            if (ii instanceof OWLObjectSomeValuesFrom) {
+                OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFrom) ii).getProperty();
+                if (this.right instanceof UnboundVariable && this.roles.contains(property)) {
+                    return true;
+                }
+                return this.left instanceof UnboundVariable && this.roles.contains(property.getInverseProperty());
+            }
+        }
         return false;
     }
 
@@ -91,11 +125,12 @@ public class Roles implements Binary {
      * Precondition for correctness: applicable was called before.
      *
      * @param I The axiom to be applied.
-     * @param rewriter
+     * @param o The ontology.
+     * @param rewriter The rewriter that called this function.
      * @return The new atom.
      */
     @Override
-    public RewritableAtom apply(OWLAxiom I, Rewriter rewriter) {
+    public RewritableAtom apply(OWLAxiom I, Ontology o, Rewriter rewriter) {
         return null;
     }
 

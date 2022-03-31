@@ -1,6 +1,7 @@
 package at.ac.tuwien.informatics.structure.query;
 
 import at.ac.tuwien.informatics.reformulation.Rewriter;
+import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.Substitution;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
@@ -125,11 +126,12 @@ public class ArbitraryLengthAtom implements Binary {
      * Note that no axiom is applicable to atoms of this type.
      *
      * @param I The axiom to be applied.
+     * @param o The ontology.
      * @param rewriter The rewriter that called this function on this atom.
      * @return The new atom.
      */
     @Override
-    public RewritableAtom apply(OWLAxiom I, Rewriter rewriter) {
+    public RewritableAtom apply(OWLAxiom I, Ontology o, Rewriter rewriter) {
         return new ArbitraryLengthAtom(new HashSet<>(this.roles), this.left.getFresh(), this.right.getFresh());
     }
 

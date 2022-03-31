@@ -10,14 +10,12 @@ import at.ac.tuwien.informatics.structure.query.Roles;
 import at.ac.tuwien.informatics.structure.query.UnboundVariable;
 import at.ac.tuwien.informatics.structure.query.Variable;
 import org.junit.jupiter.api.Test;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class TestRoles {
 
@@ -119,19 +117,19 @@ public class TestRoles {
 
         assertEquals(subroles, r1.getRoles());
     }
-/*
     @Test
     public void testApplicable() throws OWLOntologyCreationException, NotOWL2QLException {
         // load ontology
         File resourcesDirectory = new File("src/test/resources/university.owl");
         Ontology o = new Ontology(resourcesDirectory.getAbsolutePath());
-        SinglePathAtom p = new SingleLengthSinglePathAtom(Collections.singleton("teaches"), new Variable("x"),
+        Roles p = new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("teaches"))),
+                new Variable("x"),
                 new UnboundVariable("y"));
 
         Set<OWLAxiom> applicableAxioms = new HashSet<>();
 
         for (OWLAxiom I: o.getOntology().getAxioms()) {
-            if (p.applicable(o, I)) {
+            if (p.applicable(I)) {
                 applicableAxioms.add(I);
             }
         }
@@ -142,15 +140,103 @@ public class TestRoles {
         resourcesDirectory = new File("src/test/resources/university2.ttl");
         o = new Ontology(resourcesDirectory.getAbsolutePath());
 
+        p = new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("gradStudentSupervisedBy"))),
+                new Variable("x"),
+                new UnboundVariable("y"));
+
+        p.saturate(o);
+
         applicableAxioms = new HashSet<>();
 
         for (OWLAxiom I: o.getOntology().getAxioms()) {
-            if (p.applicable(o, I)) {
+            if (p.applicable(I)) {
                 applicableAxioms.add(I);
             }
         }
-        // inverses!
-        assertEquals(3, applicableAxioms.size());
+
+        assertEquals(1, applicableAxioms.size());
+
+        p = new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("gradStudentSupervisedBy"))),
+                new UnboundVariable("x"),
+                new UnboundVariable("y"));
+
+        p.saturate(o);
+
+        applicableAxioms = new HashSet<>();
+
+        for (OWLAxiom I: o.getOntology().getAxioms()) {
+            if (p.applicable(I)) {
+                applicableAxioms.add(I);
+            }
+        }
+
+        assertEquals(1, applicableAxioms.size());
+
+        p = new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("gradStudentSupervisedBy")
+                .getInverseProperty())),
+                new UnboundVariable("x"),
+                new UnboundVariable("y"));
+
+        p.saturate(o);
+
+        applicableAxioms = new HashSet<>();
+
+        for (OWLAxiom I: o.getOntology().getAxioms()) {
+            if (p.applicable(I)) {
+                applicableAxioms.add(I);
+            }
+        }
+
+        assertEquals(1, applicableAxioms.size());
+
+        p = new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("gradStudentSupervisedBy")
+                .getInverseProperty())),
+                new UnboundVariable("x"),
+                new Variable("y"));
+
+        p.saturate(o);
+
+        applicableAxioms = new HashSet<>();
+
+        for (OWLAxiom I: o.getOntology().getAxioms()) {
+            if (p.applicable(I)) {
+                applicableAxioms.add(I);
+            }
+        }
+
+        assertEquals(1, applicableAxioms.size());
+
+        p = new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("gradStudentSupervisedBy")
+                .getInverseProperty())),
+                new Variable("x"),
+                new Variable("y"));
+
+        p.saturate(o);
+
+        applicableAxioms = new HashSet<>();
+
+        for (OWLAxiom I: o.getOntology().getAxioms()) {
+            if (p.applicable(I)) {
+                applicableAxioms.add(I);
+            }
+        }
+
+        assertEquals(0, applicableAxioms.size());
+
+        p = new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("gradStudentSupervisedBy"))),
+                new Variable("x"),
+                new Variable("y"));
+
+        p.saturate(o);
+
+        applicableAxioms = new HashSet<>();
+
+        for (OWLAxiom I: o.getOntology().getAxioms()) {
+            if (p.applicable(I)) {
+                applicableAxioms.add(I);
+            }
+        }
+
+        assertEquals(0, applicableAxioms.size());
     }
- */
 }

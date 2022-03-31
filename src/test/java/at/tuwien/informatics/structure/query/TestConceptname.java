@@ -74,18 +74,18 @@ public class TestConceptname {
 
         assertEquals("Professor(x)", c1.toString());
     }
-/*
+
     @Test
     public void testApplicable() throws OWLOntologyCreationException, NotOWL2QLException {
         // load ontology
         File resourcesDirectory = new File("src/test/resources/university.owl");
         Ontology o = new Ontology(resourcesDirectory.getAbsolutePath());
-        Conceptname a = new Conceptname("Professor", new Variable("x"));
+        Conceptname a = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
 
         Set<OWLAxiom> applicableAxioms = new HashSet<>();
 
         for (OWLAxiom I: o.getOntology().getAxioms()) {
-            if (a.applicable(o, I)) {
+            if (a.applicable(I)) {
                 applicableAxioms.add(I);
             }
         }
@@ -98,36 +98,37 @@ public class TestConceptname {
         // load ontology
         File resourcesDirectory = new File("src/test/resources/university.owl");
         Ontology o = new Ontology(resourcesDirectory.getAbsolutePath());
-        Conceptname a = new Conceptname("Professor", new Variable("x"));
+        Conceptname a = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
         Rewriter rewriter = new RewriterImpl();
 
         Set<RewritableAtom> rewritten =
-                new HashSet<>(Collections.singleton(new Conceptname("Professor", new Variable("x"))));
+                new HashSet<>(Collections.singleton(new Conceptname(o.getClassMap().get("Professor"), new Variable("x"))));
         for (OWLAxiom I: o.getOntology().getAxioms()) {
-            if (a.applicable(o, I)) {
-                rewritten.add(a.apply(o, I, rewriter));
+            if (a.applicable(I)) {
+                rewritten.add(a.apply(I, o, rewriter));
             }
         }
         assertEquals(3, rewritten.size());
         assertEquals(new HashSet<>(
                 Arrays.asList(
-                        new Conceptname("Professor", new Variable("x")),
-                        new Conceptname("AssistantProf", new Variable("x")),
-                        new SingleLengthSinglePathAtom(Collections.singleton("teaches"), new Variable("x"),
-                                new UnboundVariable("v1")))),
+                        new Conceptname(o.getClassMap().get("Professor"), new Variable("x")),
+                        new Conceptname(o.getClassMap().get("Assistant_Prof"), new Variable("x")),
+                        new Roles(new HashSet<>(Arrays.asList(o.getPropertyMap().get("teaches"),
+                                o.getPropertyMap().get("taughtBy").getInverseProperty())),
+                                new Variable("x"), new UnboundVariable("v1")))),
                 rewritten);
 
-        a = new Conceptname("Course", new Variable("y"));
-        rewritten = new HashSet<>(Collections.singleton(new Conceptname("Course", new Variable("y"))));
+        a = new Conceptname(o.getClassMap().get("Course"), new Variable("y"));
+        rewritten = new HashSet<>(Collections.singleton(new Conceptname(o.getClassMap().get("Course"), new Variable("y"))));
         for (OWLAxiom I: o.getOntology().getAxioms()) {
-            if (a.applicable(o, I)) {
-                rewritten.add(a.apply(o, I, rewriter));
+            if (a.applicable(I)) {
+                rewritten.add(a.apply(I, o, rewriter));
             }
         }
         assertEquals(2, rewritten.size());
-        assertEquals(new HashSet<>(Arrays.asList(new Conceptname("Course", new Variable("y")),
-                new SingleLengthSinglePathAtom(Collections.singleton("teaches"),
-                        new UnboundVariable("v2"), new Variable("y")))), rewritten);
+        assertEquals(new HashSet<>(Arrays.asList(new Conceptname(o.getClassMap().get("Course"), new Variable("y")),
+                new Roles(new HashSet<>(Arrays.asList(o.getPropertyMap().get("teaches").getInverseProperty(),
+                        o.getPropertyMap().get("taughtBy"))),
+                        new Variable("y"), new UnboundVariable("v2")))), rewritten);
     }
- */
 }

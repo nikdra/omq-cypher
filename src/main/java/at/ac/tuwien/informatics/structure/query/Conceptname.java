@@ -7,6 +7,7 @@ import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.semanticweb.owlapi.model.*;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -63,19 +64,19 @@ public class Conceptname implements RewritableAtom {
     /**
      * Return true if the atom can be replaced by another atom given an axiom.
      *
-     * @param a The axiom to be applied.
+     * @param I The axiom to be applied.
      * @return True if the axiom is applicable, false otherwise.
      */
     @Override
-    public boolean applicable(OWLAxiom a) {
-        if (a instanceof OWLSubClassOfAxiom) {
-            return ((OWLSubClassOfAxiom) a).getSuperClass().equals(this.name);
+    public boolean applicable(OWLAxiom I) {
+        if (I instanceof OWLSubClassOfAxiom) {
+            return ((OWLSubClassOfAxiom) I).getSuperClass().equals(this.name);
         }
-        if (a instanceof OWLObjectPropertyDomainAxiom) {
-            return ((OWLObjectPropertyDomainAxiom) a).getDomain().equals(this.name);
+        if (I instanceof OWLObjectPropertyDomainAxiom) {
+            return ((OWLObjectPropertyDomainAxiom) I).getDomain().equals(this.name);
         }
-        if (a instanceof OWLObjectPropertyRangeAxiom) {
-            return ((OWLObjectPropertyRangeAxiom) a).getRange().equals(this.name);
+        if (I instanceof OWLObjectPropertyRangeAxiom) {
+            return ((OWLObjectPropertyRangeAxiom) I).getRange().equals(this.name);
         }
         return false;
     }
@@ -84,31 +85,29 @@ public class Conceptname implements RewritableAtom {
     /**
      * Apply a replacement by an axiom on this atom and return the new atom.
      * Precondition for correctness: applicable was called before.
-     * @param a The axiom to be applied.
+     *
+     * @param I The axiom to be applied.
+     * @param o The ontology.
      * @return The new atom.
      */
     @Override
-    public RewritableAtom apply(OWLAxiom a, Rewriter rewriter) {
-        /*
-        if (a instanceof OWLSubClassOfAxiom) { // A_1 ISA A
-            OWLSubClassOfAxiom b = (OWLSubClassOfAxiom) a;
-            OWLClassExpression subclass = b.getSubClass();
-            String subclassname = ((OWLClass) subclass).getIRI().getFragment();
-            return new Conceptname(subclassname, this.term.getFresh());
+    public RewritableAtom apply(OWLAxiom I, Ontology o, Rewriter rewriter) {
+        if (I instanceof OWLSubClassOfAxiom) { // A_1 ISA A
+            OWLSubClassOfAxiom b = (OWLSubClassOfAxiom) I;
+            OWLClass subclass = (OWLClass) b.getSubClass();
+            return new Conceptname(subclass, this.term.getFresh());
         }
         // domain/range axiom
         UnboundVariable v = new UnboundVariable(rewriter .getFreshVariableName());
-        if (a instanceof OWLObjectPropertyRangeAxiom) {  // exists r^- ISA A
-            OWLObjectPropertyExpression subproperty = ((OWLObjectPropertyRangeAxiom) a).getProperty();
-            String rolename = subproperty.getNamedProperty().getIRI().getFragment();
-            return new SingleLengthSinglePathAtom(Collections.singleton(rolename), v, this.term.getFresh());
+        OWLObjectPropertyExpression property;
+        if (I instanceof OWLObjectPropertyRangeAxiom) {  // exists r^- ISA A
+            property = ((OWLObjectPropertyRangeAxiom) I).getProperty().getInverseProperty();
         } else {  // exists r ISA A
-            OWLObjectPropertyExpression subproperty = ((OWLObjectPropertyDomainAxiom) a).getProperty();
-            String rolename = subproperty.getNamedProperty().getIRI().getFragment();
-            return new SingleLengthSinglePathAtom(Collections.singleton(rolename), this.term.getFresh(), v);
+            property = ((OWLObjectPropertyDomainAxiom) I).getProperty();
         }
-         */
-        return null;
+        Roles roles = new Roles(new HashSet<>(Collections.singleton(property)), this.term.getFresh(), v);
+        roles.saturate(o);
+        return roles;
     }
 
     /**
