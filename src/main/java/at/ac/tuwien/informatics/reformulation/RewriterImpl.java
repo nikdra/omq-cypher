@@ -29,14 +29,15 @@ public class RewriterImpl implements Rewriter {
         Q.add(tau(saturatePaths(q, o)));
         Set<RewritableQuery> Qp = null;
 
+
         while(!Q.equals(Qp)) {
             Qp = new HashSet<>(Q);
             for (RewritableQuery qp: Qp) {
                 // (a) apply axioms, if possible
                 for (RewritableAtom a: qp.getBody()) {
                     for (OWLAxiom I: o.getOntology().getAxioms()) {
-                        if (a.applicable(o, I)) {
-                            Q.add(replace(qp, a, I));
+                        if(a.applicable(I)) {
+                            Q.add(replace(qp, a, o, I));
                         }
                     }
                 }
@@ -50,6 +51,7 @@ public class RewriterImpl implements Rewriter {
                 // TODO path rewritings
             }
         }
+
         return Qp;
     }
 
@@ -71,8 +73,10 @@ public class RewriterImpl implements Rewriter {
             if (a instanceof Conceptname) { // Concept name
                 body.add((Conceptname) a);
             }
-            else if (a instanceof Role) { // Role atom
-                body.add(((Role) a).toSingleLengthSinglePathAtom());  // transform to single length single path atom
+            else if (a instanceof Roles) { // Role atom
+                Roles b = (Roles) a;
+                b.saturate(o); // exhaustively apply subrole/inverse axioms
+                body.add(b);
             }
             else { // Path
                 Path b = (Path) a;
@@ -85,11 +89,11 @@ public class RewriterImpl implements Rewriter {
                 PathElement element = it.next();
                 while(it.hasNext()) {
                     Variable right = new Variable("v" + ++variable_counter);
-                    body.add(element.toSinglePathAtom(left, right));
+                    body.add(element.toBinary(left, right));
                     element = it.next();
                     left = new Variable("v" + variable_counter);
                 }
-                body.add(element.toSinglePathAtom(left, b.getRight().getFresh()));
+                body.add(element.toBinary(left, b.getRight().getFresh()));
             }
         }
 
@@ -117,8 +121,8 @@ public class RewriterImpl implements Rewriter {
                     variableCount.put((Variable) b.getTerm(), count + 1);
                 }
             }
-            if (a instanceof SinglePathAtom) { // single path atom - includes roles
-                SinglePathAtom b = (SinglePathAtom) a;
+            if (a instanceof Binary) { // single path atom - includes roles
+                Binary b = (Binary) a;
                 if (b.getLeft() instanceof Variable) {
                     Integer count = variableCount.getOrDefault((Variable) b.getLeft(), 0);
                     variableCount.put((Variable) b.getLeft(), count + 1);
@@ -143,8 +147,8 @@ public class RewriterImpl implements Rewriter {
                 }
                 body.add(new Conceptname(b.getName(), t)); // add to new query
             }
-            if (a instanceof SinglePathAtom) { // single path atom - includes roles
-                SinglePathAtom b = (SinglePathAtom) a;
+            if (a instanceof Binary) { // roles, arb.length atoms
+                Binary b = (Binary) a;
                 Term left = b.getLeft().getFresh();
                 Term right = b.getRight().getFresh();
                 if (b.getLeft() instanceof Variable) {
@@ -167,22 +171,23 @@ public class RewriterImpl implements Rewriter {
     }
 
     /**
-     * Given a Xi-restricted query q, and two path atoms in q, return the result of concatenating them.
-     * Precondition: they can be concatenated.
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of concatenating them.
+     * Precondition: they can be concatenated i.e., they have a nonempty intersection of roles, terms in the correct
+     * places and one of them is of arbitrary length.
      *
      * @param q  Xi-restricted query.
-     * @param a1 A single path atom.
-     * @param a2 A single path atom.
+     * @param a1 A binary atom.
+     * @param a2 An arbitrary length atom.
      * @return A Xi-restricted query q'.
      */
     @Override
-    public RewritableQuery concatenate(RewritableQuery q, SinglePathAtom a1, SinglePathAtom a2) {
-        return q;
+    public RewritableQuery concatenate(RewritableQuery q, Binary a1, ArbitraryLengthAtom a2) {
+        return null;
     }
 
     /**
-     * Given a Xi-restricted query q, and two path atoms in q, return the result of merging them.
-     * Precondition: they can be merged.
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of merging them.
+     * Precondition: they can be merged i.e., they have a nonempty intersection of roles.
      *
      * @param q  Xi-restricted query.
      * @param a1 A single path atom.
@@ -190,20 +195,22 @@ public class RewriterImpl implements Rewriter {
      * @return A Xi-restricted query q'.
      */
     @Override
-    public RewritableQuery merge(RewritableQuery q, SinglePathAtom a1, SinglePathAtom a2) {
-        return q;
+    public RewritableQuery merge(RewritableQuery q, Binary a1, Binary a2) {
+        return null;
     }
 
     /**
      * Given a Xi-restricted query q, and an arbitrary path atom in q.
      * If the arbitrary length path atom can be dropped, then return the result of dropping it.
+     * Note that the query body can _not_ be empty.
      *
      * @param q Xi-restricted query.
      * @param a An arbitrary length single path atom.
      * @return A Xi-restricted query q'.
      */
     @Override
-    public RewritableQuery drop(RewritableQuery q, ArbitraryLengthSinglePathAtom a) {
+    public RewritableQuery drop(RewritableQuery q, ArbitraryLengthAtom a) {
+        // remember: no empty query body!
         return q;
     }
 
@@ -223,26 +230,43 @@ public class RewriterImpl implements Rewriter {
             Conceptname b2 = (Conceptname) a2;
             if (b1.getName().equals(b2.getName())) {
                 // compute unifier, return result of applying the unifier to q
-                Unifier unifier = new Unifier(Collections.singletonList(b1.getTerm().getFresh()),
-                        Collections.singletonList(b2.getTerm().getFresh()));
+                Unifier unifier = new Unifier(Collections.singletonList(b1.getTerm()),
+                        Collections.singletonList(b2.getTerm()));
                 return unifier.apply(q);
             }
-        } else if (a1 instanceof SingleLengthSinglePathAtom && a2 instanceof SingleLengthSinglePathAtom) {
-            SingleLengthSinglePathAtom b1 = (SingleLengthSinglePathAtom) a1;
-            SingleLengthSinglePathAtom b2 = (SingleLengthSinglePathAtom) a2;
-            if (b1.getRolenames().equals(b2.getRolenames())) {
+        } else if (a1 instanceof Roles && a2 instanceof Roles) {
+            Roles b1 = (Roles) a1;
+            Roles b2 = (Roles) a2;
+            if (b1.getRoles().equals(b2.getRoles())) {
                 // compute unifier, return result of applying the unifier to q
-                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft().getFresh(), b1.getRight().getFresh()),
-                        Arrays.asList(b2.getLeft().getFresh(), b2.getRight().getFresh()));
+                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft(), b1.getRight()),
+                        Arrays.asList(b2.getLeft(), b2.getRight()));
                 return unifier.apply(q);
+            } else {
+                // it could be that we can unify once we "invert" one of the role atoms
+                // in this case, inverting means that we switch the left and right variable
+                // and invert all the roles in the set of roles.
+                Roles b3 = b1.getInverse();
+                if (b3.getRoles().equals(b2.getRoles())) {
+                    // create a copy of the query
+                    RewritableQuery qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // remove b1
+                    qp.getBody().remove(b1);
+                    // add b3
+                    qp.getBody().add(b3);
+                    // compute unifier, return result of applying the unifier to q
+                    Unifier unifier = new Unifier(Arrays.asList(b3.getLeft(), b3.getRight()),
+                            Arrays.asList(b2.getLeft(), b2.getRight()));
+                    return unifier.apply(qp);
+                }
             }
-        } else if (a1 instanceof ArbitraryLengthSinglePathAtom && a2 instanceof ArbitraryLengthSinglePathAtom) {
-            ArbitraryLengthSinglePathAtom b1 = (ArbitraryLengthSinglePathAtom) a1;
-            ArbitraryLengthSinglePathAtom b2 = (ArbitraryLengthSinglePathAtom) a2;
-            if (b1.getRolenames().equals(b2.getRolenames())) {
+        } else if (a1 instanceof ArbitraryLengthAtom && a2 instanceof ArbitraryLengthAtom) {
+            ArbitraryLengthAtom b1 = (ArbitraryLengthAtom) a1;
+            ArbitraryLengthAtom b2 = (ArbitraryLengthAtom) a2;
+            if (b1.getRoles().equals(b2.getRoles())) {
                 // compute unifier, return result of applying the unifier to q
-                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft().getFresh(), b1.getRight().getFresh()),
-                        Arrays.asList(b2.getLeft().getFresh(), b2.getRight().getFresh()));
+                Unifier unifier = new Unifier(Arrays.asList(b1.getLeft(), b1.getRight()),
+                        Arrays.asList(b2.getLeft(), b2.getRight()));
                 return unifier.apply(q);
             }
         }
@@ -250,15 +274,26 @@ public class RewriterImpl implements Rewriter {
     }
 
     /**
-     * Replace atom in query
+     * Replace atom in query.
+     * Assumes that the axiom is applicable to the atom.
      *
      * @param q Xi-restricted query.
      * @param a A rewritable atom in the query.
-     * @param I An OWL QL (DL-Lite) Axiom
+     * @param o The ontology wrapper object.
+     * @param I An OWL QL (DL-Lite) Axiom.
      * @return A Xi-restricted query q'.
      */
     @Override
-    public RewritableQuery replace(RewritableQuery q, RewritableAtom a, OWLAxiom I) {
-        return q;
+    public RewritableQuery replace(RewritableQuery q, RewritableAtom a, Ontology o, OWLAxiom I) {
+        List<Variable> head = new LinkedList<>(q.getHead());
+        Set<RewritableAtom> body = new HashSet<>(q.getBody());
+        body.remove(a);
+        body.add(a.apply(I, o, this));
+        return new RewritableQuery(head, body);
+    }
+
+    @Override
+    public String getFreshVariableName() {
+        return "v" + ++this.variable_counter;
     }
 }

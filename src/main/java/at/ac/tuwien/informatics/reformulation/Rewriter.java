@@ -40,26 +40,27 @@ public interface Rewriter {
     RewritableQuery tau(RewritableQuery q);
 
     /**
-     * Given a Xi-restricted query q, and two path atoms in q, return the result of concatenating them.
-     * Precondition: they can be concatenated.
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of concatenating them.
+     * Precondition: they can be concatenated i.e., they have a nonempty intersection of roles, terms in the correct
+     * places and one of them is of arbitrary length.
      *
      * @param q Xi-restricted query.
-     * @param a1 A single path atom.
-     * @param a2 A single path atom.
+     * @param a1 A binary atom.
+     * @param a2 An arbitrary length atom.
      * @return A Xi-restricted query q'.
      */
-    RewritableQuery concatenate(RewritableQuery q, SinglePathAtom a1, SinglePathAtom a2);
+    RewritableQuery concatenate(RewritableQuery q, Binary a1, ArbitraryLengthAtom a2);
 
     /**
-     * Given a Xi-restricted query q, and two path atoms in q, return the result of merging them.
-     * Precondition: they can be merged.
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of merging them.
+     * Precondition: they can be merged i.e., they have a nonempty intersection of roles.
      *
      * @param q Xi-restricted query.
      * @param a1 A single path atom.
      * @param a2 A single path atom.
      * @return A Xi-restricted query q'.
      */
-    RewritableQuery merge(RewritableQuery q, SinglePathAtom a1, SinglePathAtom a2);
+    RewritableQuery merge(RewritableQuery q, Binary a1, Binary a2);
 
     /**
      * Given a Xi-restricted query q, and an arbitrary path atom in q.
@@ -69,7 +70,7 @@ public interface Rewriter {
      * @param a An arbitrary length single path atom.
      * @return A Xi-restricted query q'.
      */
-    RewritableQuery drop(RewritableQuery q, ArbitraryLengthSinglePathAtom a);
+    RewritableQuery drop(RewritableQuery q, ArbitraryLengthAtom a);
 
     /**
      * Given a Xi-restricted query q, and two atoms in q.
@@ -87,8 +88,11 @@ public interface Rewriter {
      *
      * @param q Xi-restricted query.
      * @param a A rewritable atom in the query.
+     * @param o The ontology wrapper object.
      * @param I An OWL QL (DL-Lite) Axiom
      * @return A Xi-restricted query q'.
      */
-    RewritableQuery replace(RewritableQuery q, RewritableAtom a, OWLAxiom I);
+    RewritableQuery replace(RewritableQuery q, RewritableAtom a, Ontology o, OWLAxiom I);
+
+    String getFreshVariableName();
 }

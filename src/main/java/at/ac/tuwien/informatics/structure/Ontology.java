@@ -52,7 +52,7 @@ public class Ontology {
         this.classMap = new HashMap<>();
         for (OWLClass c : this.ontology.getClassesInSignature()) {
             if (!c.isTopEntity()) {
-                classMap.put(c.toStringID().split("#")[1], c);
+                classMap.put(c.getIRI().getFragment(), c);
             }
         }
     }
@@ -63,7 +63,7 @@ public class Ontology {
     private void generatePropertyMap() {
         this.propertyMap = new HashMap<>();
         for (OWLObjectProperty p : this.ontology.getObjectPropertiesInSignature()) {
-            propertyMap.put(p.toStringID().split("#")[1], p);
+            propertyMap.put(p.getIRI().getFragment(), p);
         }
     }
 

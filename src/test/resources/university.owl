@@ -21,6 +21,15 @@
     
 
 
+    <!-- http://example.org/voc#taughtBy -->
+
+    <owl:ObjectProperty rdf:about="http://example.org/voc#taughtBy">
+        <owl:inverseOf rdf:resource="http://example.org/voc#teaches"/>
+        <owl:propertyDisjointWith rdf:resource="http://example.org/voc#teaches"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://example.org/voc#teaches -->
 
     <owl:ObjectProperty rdf:about="http://example.org/voc#teaches">
@@ -43,7 +52,7 @@
 
     <!-- http://example.org/voc#AssistantProf -->
 
-    <owl:Class rdf:about="http://example.org/voc#AssistantProf">
+    <owl:Class rdf:about="http://example.org/voc#Assistant_Prof">
         <rdfs:subClassOf rdf:resource="http://example.org/voc#Professor"/>
     </owl:Class>
     

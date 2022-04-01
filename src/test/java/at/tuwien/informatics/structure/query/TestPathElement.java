@@ -19,52 +19,64 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class TestPathElement {
 
     @Test
-    public void testEqualPathElements() {
-        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Collections.singleton("r")));
-        PathElement p2 = new SingleLengthPathElement(new HashSet<>(Collections.singleton("r")));
+    public void testEqualPathElements() throws OWLOntologyCreationException, NotOWL2QLException {
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/subroles.owl");
+        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))));
+        PathElement p2 = new SingleLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))));
 
         assertEquals(p1, p2);
 
-        p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList("r", "s")));
-        p2 = new SingleLengthPathElement(new HashSet<>(Arrays.asList("r", "s")));
+        p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"))));
+        p2 = new SingleLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"))));
 
         assertEquals(p1, p2);
 
-        p1 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("r")));
-        p2 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("r")));
+        p1 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))));
+        p2 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))));
 
         assertEquals(p1, p2);
 
-        p1 = new ArbitraryLengthPathElement(new HashSet<>(Arrays.asList("r", "s")));
-        p2 = new ArbitraryLengthPathElement(new HashSet<>(Arrays.asList("r", "s")));
+        p1 = new ArbitraryLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"))));
+        p2 = new ArbitraryLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"))));
 
         assertEquals(p1, p2);
     }
 
     @Test
-    public void testUnequalElements() {
-        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Collections.singleton("r")));
-        PathElement p2 = new SingleLengthPathElement(new HashSet<>(Collections.singleton("s")));
+    public void testUnequalElements() throws OWLOntologyCreationException, NotOWL2QLException {
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/subroles.owl");
+        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))));
+        PathElement p2 = new SingleLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("s"))));
 
         assertNotEquals(p1, p2);
 
-        p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList("r", "s", "t")));
-        p2 = new SingleLengthPathElement(new HashSet<>(Arrays.asList("r", "s")));
+        p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"), o.getPropertyMap().get("t"))));
+        p2 = new SingleLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"))));
 
         assertNotEquals(p1, p2);
 
-        p1 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("r")));
-        p2 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("s")));
+        p1 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))));
+        p2 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("s"))));
 
         assertNotEquals(p1, p2);
 
-        p1 = new ArbitraryLengthPathElement(new HashSet<>(Arrays.asList("r", "s", "t")));
-        p2 = new ArbitraryLengthPathElement(new HashSet<>(Arrays.asList("r", "s")));
+        p1 = new ArbitraryLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"), o.getPropertyMap().get("t"))));
+        p2 = new ArbitraryLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"))));
 
         assertNotEquals(p1, p2);
 
-        p1 = new SingleLengthPathElement(new HashSet<>(Collections.singleton("r")));
-        p2 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton("r")));
+        p1 = new SingleLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))));
+        p2 = new ArbitraryLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))));
 
         assertNotEquals(p1, p2);
     }
@@ -72,11 +84,13 @@ public class TestPathElement {
     @Test
     public void testSaturate() throws OWLOntologyCreationException, NotOWL2QLException {
         // load ontology
-        File resourcesDirectory = new File("src/test/resources/subroles.owl");
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/subroles.owl");
 
-        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList("r", "s", "t")));
-        PathElement p2 = new SingleLengthPathElement(new HashSet<>(Collections.singleton("s")));
-        p2.saturate(new Ontology(resourcesDirectory.getAbsolutePath()));
+        PathElement p1 = new SingleLengthPathElement(new HashSet<>(Arrays.asList(o.getPropertyMap().get("r"),
+                o.getPropertyMap().get("s"), o.getPropertyMap().get("t"))));
+        PathElement p2 = new SingleLengthPathElement(new HashSet<>(Collections.singleton(o.getPropertyMap().get("s"))));
+        p2.saturate(o);
 
         assertEquals(p1, p2);
     }

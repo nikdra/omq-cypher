@@ -4,31 +4,38 @@ query : head ':-' body EOF ;
 
 head : 'q(' variable (',' variable)* ')' ;
 
-body : atom (',' atom)* ;
+variable : WORD ;
 
-atom : conceptname | role | path ;
+body : atom (',' atom )* ;
 
-conceptname : WORDS '(' variable ')' ;
+atom : conceptname | roles | path;
 
-role : WORDS '(' left=variable ',' right=variable ')' ;
+conceptname : words '(' variable ')' ;
+
+roles : properties '(' left=variable ',' right=variable ')' ;
 
 path : elements '(' left=variable ',' right=variable ')' ;
 
-elements : pathElement ('/' pathElement )* ;
+elements : pathElement ('/' pathElement)* ;
 
 pathElement : arbitraryLengthPathElement | singleLengthPathElement ;
 
-arbitraryLengthPathElement : WORDS '*' | '(' WORDS ('|' WORDS)+ ')' '*' ;
+arbitraryLengthPathElement : rolename '*' | '(' rolename ('|' rolename)+ ')' '*';
 
-singleLengthPathElement : WORDS | '(' WORDS ('|' WORDS)+ ')' ;
+singleLengthPathElement : rolename | '(' rolename ('|' rolename)+ ')' ;
 
-variable : LETTER ;
+properties : property | '(' property ('|' property)+ ')' ;
 
-fragment LOWERCASE : [a-z] ;
-fragment UPPERCASE : [A-Z] ;
+property : rolename | inverse ;
 
-LETTER : LOWERCASE ;
+rolename : words ;
 
-WORDS : (LOWERCASE | UPPERCASE)+ ('_' WORDS)*;
+inverse : words'-' ;
+
+words : WORD ('_' WORD)* ;
+
+WORD : LETTER+ ;
+
+fragment LETTER : ('a'..'z' | 'A'..'Z') ;
 
 UNKNOWN_CHAR : . ;

@@ -1,5 +1,8 @@
 package at.ac.tuwien.informatics.structure.query;
 
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -10,10 +13,10 @@ public class SingleLengthPathElement extends PathElement {
     /**
      * Initialize a new path element.
      *
-     * @param rolenames the set (disjunction) of role names occuring in this path element.
+     * @param roles the set (disjunction) of role names occuring in this path element.
      */
-    public SingleLengthPathElement(Set<String> rolenames) {
-        super(rolenames);
+    public SingleLengthPathElement(Set<OWLObjectPropertyExpression> roles) {
+        super(roles);
     }
 
     @Override
@@ -28,7 +31,7 @@ public class SingleLengthPathElement extends PathElement {
 
         SingleLengthPathElement a = (SingleLengthPathElement) obj;
 
-        return this.rolenames.equals(a.rolenames);
+        return this.roles.equals(a.roles);
     }
 
     @Override
@@ -41,10 +44,10 @@ public class SingleLengthPathElement extends PathElement {
      *
      * @param left The left {@link Term}.
      * @param right The right {@link Term}.
-     * @return This path element as a rewritable single path atom.
+     * @return This path element as a rewritable roles atom.
      */
     @Override
-    public SinglePathAtom toSinglePathAtom(Term left, Term right) {
-        return new SingleLengthSinglePathAtom(this.rolenames, left, right);
+    public Roles toBinary(Term left, Term right) {
+        return new Roles(new HashSet<>(this.roles), left, right);
     }
 }
