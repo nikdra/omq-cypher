@@ -60,7 +60,7 @@ public interface Rewriter {
      * @param a2 A single path atom.
      * @return A Xi-restricted query q'.
      */
-    RewritableQuery merge(RewritableQuery q, Binary a1, Binary a2);
+    Set<RewritableQuery> merge(RewritableQuery q, Binary a1, Binary a2);
 
     /**
      * Given a Xi-restricted query q, and an arbitrary path atom in q.
