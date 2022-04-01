@@ -56,7 +56,8 @@ public class ArbitraryLengthAtom implements Binary {
 
         ArbitraryLengthAtom r = (ArbitraryLengthAtom) obj;
 
-        return this.roles.equals(r.roles) && this.left.equals(r.left) && this.right.equals(r.right);
+        return this.roles.equals(r.roles) && this.left.toString().equals(r.left.toString())
+                && this.right.toString().equals(r.right.toString());
     }
 
     @Override

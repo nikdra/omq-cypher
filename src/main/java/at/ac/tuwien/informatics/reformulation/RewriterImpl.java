@@ -28,7 +28,7 @@ public class RewriterImpl implements Rewriter {
         Set<RewritableQuery> Q = new HashSet<>();
         Q.add(tau(saturatePaths(q, o)));
         Set<RewritableQuery> Qp = null;
-        /*
+
 
         while(!Q.equals(Qp)) {
             Qp = new HashSet<>(Q);
@@ -36,7 +36,7 @@ public class RewriterImpl implements Rewriter {
                 // (a) apply axioms, if possible
                 for (RewritableAtom a: qp.getBody()) {
                     for (OWLAxiom I: o.getOntology().getAxioms()) {
-                        if(a.applicable(o, I)) {
+                        if(a.applicable(I)) {
                             Q.add(replace(qp, a, o, I));
                         }
                     }
@@ -51,7 +51,7 @@ public class RewriterImpl implements Rewriter {
                 // TODO path rewritings
             }
         }
-         */
+
         return Qp;
     }
 
@@ -280,19 +280,16 @@ public class RewriterImpl implements Rewriter {
      * @param q Xi-restricted query.
      * @param a A rewritable atom in the query.
      * @param o The ontology wrapper object.
-     * @param I An OWL QL (DL-Lite) Axiom
+     * @param I An OWL QL (DL-Lite) Axiom.
      * @return A Xi-restricted query q'.
      */
     @Override
     public RewritableQuery replace(RewritableQuery q, RewritableAtom a, Ontology o, OWLAxiom I) {
-        /*
         List<Variable> head = new LinkedList<>(q.getHead());
         Set<RewritableAtom> body = new HashSet<>(q.getBody());
         body.remove(a);
-        body.add(a.apply(o, I, this));
+        body.add(a.apply(I, o, this));
         return new RewritableQuery(head, body);
-         */
-        return null;
     }
 
     @Override

@@ -28,6 +28,11 @@ public class TestConceptname {
         Conceptname c2 = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
 
         assertEquals(c1, c2);
+
+        c1 = new Conceptname(o.getClassMap().get("Professor"), new UnboundVariable("x"));
+        c2 = new Conceptname(o.getClassMap().get("Professor"), new UnboundVariable("y"));
+
+        assertEquals(c1, c2);
     }
 
     @Test
@@ -44,7 +49,7 @@ public class TestConceptname {
 
         assertNotEquals(c1, c2);
 
-        c1 = new Conceptname(o.getClassMap().get("Professor"), new UnboundVariable("x"));
+        c1 = new Conceptname(o.getClassMap().get("Professor"), new Variable("x"));
         c2 = new Conceptname(o.getClassMap().get("Professor"), new UnboundVariable("y"));
 
         assertNotEquals(c1, c2);
@@ -61,6 +66,17 @@ public class TestConceptname {
 
         HashSet<Atom> set1 = new HashSet<>(Arrays.asList(c1, c2));
         HashSet<Atom> set2 = new HashSet<>();
+        set2.add(c1);
+
+        assertEquals(set2, set1);
+
+        c1 = new Conceptname(o.getClassMap().get("Professor"), new UnboundVariable("x"));
+        c2 = new Conceptname(o.getClassMap().get("Professor"), new UnboundVariable("y"));
+
+        assertEquals(c1, c2);
+
+        set1 = new HashSet<>(Arrays.asList(c1, c2));
+        set2 = new HashSet<>();
         set2.add(c1);
 
         assertEquals(set2, set1);

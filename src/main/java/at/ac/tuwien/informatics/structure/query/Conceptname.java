@@ -45,7 +45,7 @@ public class Conceptname implements RewritableAtom {
 
         Conceptname c = (Conceptname) obj;
 
-        return this.name.equals(c.name) && this.term.equals(c.term);
+        return this.name.equals(c.name) && this.term.toString().equals(c.term.toString());
     }
 
     @Override

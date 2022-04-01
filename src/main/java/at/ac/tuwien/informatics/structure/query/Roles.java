@@ -41,6 +41,10 @@ public class Roles implements Binary {
 
     @Override
     public int hashCode() {
+        return this.hashCodePart() * this.getInverse().hashCodePart();
+    }
+
+    private int hashCodePart() {
         int hash = 3;
         hash = 53 * hash + (this.roles != null ? this.roles.hashCode() : 0);
         hash = 53 * hash + (this.left != null ? this.left.hashCode() : 0);
@@ -60,7 +64,11 @@ public class Roles implements Binary {
 
         Roles r = (Roles) obj;
 
-        return this.roles.equals(r.roles) && this.left.equals(r.left) && this.right.equals(r.right);
+        Roles inv = this.getInverse();
+
+        return (this.roles.equals(r.roles) && this.left.toString().equals(r.left.toString())
+                && this.right.toString().equals(r.right.toString())) || (inv.roles.equals(r.roles) &&
+                inv.left.toString().equals(r.left.toString()) && inv.right.toString().equals(r.right.toString()));
     }
 
     @Override
@@ -86,7 +94,7 @@ public class Roles implements Binary {
             OWLSubClassOfAxiom i = (OWLSubClassOfAxiom) I;
             if (i.getSuperClass() instanceof OWLObjectSomeValuesFrom) {
                 if (this.right instanceof UnboundVariable && // A \ISA \exists R, R(x,_)
-                        this.roles.contains(((OWLObjectSomeValuesFrom) i.getSuperClass()).getProperty()) ) {
+                        this.roles.contains(((OWLObjectSomeValuesFrom) i.getSuperClass()).getProperty())) {
                     return true;
                 }
                 // A \ISA \exists R, R-(_,x)
@@ -131,7 +139,57 @@ public class Roles implements Binary {
      */
     @Override
     public RewritableAtom apply(OWLAxiom I, Ontology o, Rewriter rewriter) {
-        return null;
+        // note: if both variables are unbound, we don't care which one we use to rewrite the atom
+        if (I instanceof OWLSubClassOfAxiom) {  // A \ISA \exists R
+            OWLSubClassOfAxiom i = (OWLSubClassOfAxiom) I;
+            if (i.getSuperClass() instanceof OWLObjectSomeValuesFrom) {
+                if (this.right instanceof UnboundVariable && // A \ISA \exists R, R(x,_)
+                        this.roles.contains(((OWLObjectSomeValuesFrom) i.getSuperClass()).getProperty())) {
+                    // return A(x)
+                    return new Conceptname((OWLClass) i.getSubClass(), this.left.getFresh());
+                }
+                // A \ISA \exists R, R-(_,y)
+                // return A(y)
+                return new Conceptname((OWLClass) i.getSubClass(), this.right.getFresh());
+            }
+        } else if (I instanceof OWLObjectPropertyDomainAxiom) { // exists r \ISA \exists R
+            Roles newatom;
+            // casting to get the domain and making sure it's \exists R
+            OWLObjectPropertyDomainAxiom i = (OWLObjectPropertyDomainAxiom) I;
+            OWLClassExpression ii = i.getDomain();
+            if (ii instanceof OWLObjectSomeValuesFrom) {
+                OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFrom) ii).getProperty();
+                if (this.right instanceof UnboundVariable && this.roles.contains(property)) {
+                    // R(x,_)
+                    newatom = new Roles(new HashSet<>(
+                            Collections.singleton(property)),
+                            this.left.getFresh(), this.right.getFresh());
+                } else {
+                    // R-(_,y)
+                    newatom = new Roles(new HashSet<>(
+                            Collections.singleton(property.getInverseProperty())),
+                            this.left.getFresh(), this.right.getFresh());
+                }
+                newatom.saturate(o);
+                return newatom;
+            }
+        }
+        // exists r- \ISA \exists R
+        Roles newatom;
+        OWLObjectPropertyRangeAxiom i = (OWLObjectPropertyRangeAxiom) I;
+        OWLClassExpression ii = i.getRange();
+        OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFrom) ii).getProperty();
+        if (this.right instanceof UnboundVariable && this.roles.contains(property)) {
+            // R(x,_)
+            newatom = new Roles(new HashSet<>(Collections.singleton(property)), this.right.getFresh(),
+                    this.left.getFresh());
+        } else {
+            // R-(_,y)
+            newatom = new Roles(new HashSet<>(Collections.singleton(property.getInverseProperty())),
+                    this.right.getFresh(), this.left.getFresh());
+        }
+        newatom.saturate(o);
+        return newatom;
     }
 
     /**

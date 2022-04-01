@@ -38,7 +38,7 @@ public class UnboundVariable implements Term {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 53 * hash + (this.name != null ? this.name.hashCode() : 0);
+        // hash = 53 * hash + (this.name != null ? this.name.hashCode() : 0);
         return hash;
     }
 
