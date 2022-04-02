@@ -3,6 +3,7 @@ package at.ac.tuwien.informatics.reformulation;
 import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.Unifier;
 import at.ac.tuwien.informatics.structure.query.*;
+import com.google.errorprone.annotations.Var;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
@@ -39,7 +40,7 @@ public class RewriterImpl implements Rewriter {
                 for (RewritableAtom a: qp.getBody()) {
                     for (OWLAxiom I: o.getOntology().getAxioms()) {
                         if(a.applicable(I)) {
-                            Q.add(replace(qp, a, o, I));
+                            Q.add(tau(replace(qp, a, o, I)));
                         }
                     }
                 }
@@ -48,6 +49,15 @@ public class RewriterImpl implements Rewriter {
                 for (RewritableAtom a1: qp.getBody()) {
                     for (RewritableAtom a2 : qp.getBody()) {
                         Q.add(tau(reduce(qp, a1, a2)));
+                    }
+                }
+
+                // (c) concatenate, if possible
+                for (RewritableAtom a1: qp.getBody()) {
+                    for (RewritableAtom a2: qp.getBody()) {
+                        if(a1 instanceof Binary && a2 instanceof ArbitraryLengthAtom && !a1.equals(a2)) {
+                            Q.add(tau(concatenate(qp, (Binary) a1, (ArbitraryLengthAtom) a2)));
+                        }
                     }
                 }
 
@@ -61,7 +71,13 @@ public class RewriterImpl implements Rewriter {
                         }
                     }
                 }
-                // TODO path rewritings
+
+                // (e) drop atoms, if possible
+                for (RewritableAtom a1: qp.getBody()) {
+                    if (a1 instanceof ArbitraryLengthAtom) {
+                        Q.add(tau(drop(qp, (ArbitraryLengthAtom) a1)));
+                    }
+                }
             }
         }
 
@@ -184,9 +200,11 @@ public class RewriterImpl implements Rewriter {
     }
 
     /**
-     * Given a Xi-restricted query q, and two binary atoms in q, return the result of concatenating them.
-     * Precondition: they can be concatenated i.e., they have a nonempty intersection of roles, terms in the correct
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of concatenating them, assuming
+     * they can be concatenated i.e., they have a nonempty intersection of roles, terms in the correct
      * places and one of them is of arbitrary length.
+     * Note that even in the presence of inverses in {@link Roles}, there is only one possible way of concatenating the
+     * atom with an arbitrary length atom.
      *
      * @param q  Xi-restricted query.
      * @param a1 A binary atom.
@@ -195,17 +213,137 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery concatenate(RewritableQuery q, Binary a1, ArbitraryLengthAtom a2) {
-        return null;
+        // small side-not: an unbound variable can become bound here, so we need to create new variables
+        RewritableQuery qp;
+        Binary r1;
+        Binary r2;
+        if (a1 instanceof Roles) {
+            if (a2.getRoles().containsAll(a1.getRoles())) {  // roles of a1 subset of roles of a2
+                // check vars
+                if (a1.getLeft().equals(a2.getLeft())) {  // append to front
+                    // create a copy of the query
+                    qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // remove atoms
+                    qp.getBody().remove(a1);
+                    qp.getBody().remove(a2);
+                    // generate new atoms
+                    r1 = new Roles(a1.getRoles(), new Variable(a1.getLeft().getName()),
+                            new Variable(a1.getRight().getName()));
+                    r2 = new ArbitraryLengthAtom(a2.getRoles(), new Variable(a1.getRight().getName()),
+                            new Variable(a2.getRight().getName()));
+                    // add atoms to query body
+                    qp.getBody().add(r1);
+                    qp.getBody().add(r2);
+                    // return result
+                    return qp;
+                } else if (a1.getRight().equals(a2.getRight())) {  // append to back
+                    // create a copy of the query
+                    qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // remove atoms
+                    qp.getBody().remove(a1);
+                    qp.getBody().remove(a2);
+                    // generate new atoms
+                    r1 = new Roles(a1.getRoles(), new Variable(a1.getLeft().getName()),
+                            new Variable(a1.getRight().getName()));
+                    r2 = new ArbitraryLengthAtom(a2.getRoles(), new Variable(a2.getLeft().getName()),
+                            new Variable(a1.getLeft().getName()));
+                    // add atoms to query body
+                    qp.getBody().add(r1);
+                    qp.getBody().add(r2);
+                    // return result
+                    return qp;
+                }
+            } else {
+                a1 = ((Roles) a1).getInverse();  // check the inverse
+                if (a2.getRoles().containsAll(a1.getRoles())) {
+                    // check vars
+                    if (a1.getLeft().equals(a2.getLeft())) {  // append to front
+                        // create a copy of the query
+                        qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                        // remove atoms
+                        qp.getBody().remove(a1);
+                        qp.getBody().remove(a2);
+                        // generate new atoms
+                        r1 = new Roles(a1.getRoles(), new Variable(a1.getLeft().getName()),
+                                new Variable(a1.getRight().getName()));
+                        r2 = new ArbitraryLengthAtom(a2.getRoles(), new Variable(a1.getRight().getName()),
+                                new Variable(a2.getRight().getName()));
+                        // add atoms to query body
+                        qp.getBody().add(r1);
+                        qp.getBody().add(r2);
+                        // return result
+                        return qp;
+                    } else if (a1.getRight().equals(a2.getRight())) {  // append to back
+                        // create a copy of the query
+                        qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                        // remove atoms
+                        qp.getBody().remove(a1);
+                        qp.getBody().remove(a2);
+                        // generate new atoms
+                        r1 = new Roles(a1.getRoles(), new Variable(a1.getLeft().getName()),
+                                new Variable(a1.getRight().getName()));
+                        r2 = new ArbitraryLengthAtom(a2.getRoles(), new Variable(a2.getLeft().getName()),
+                                new Variable(a1.getLeft().getName()));
+                        // add atoms to query body
+                        qp.getBody().add(r1);
+                        qp.getBody().add(r2);
+                        // return result
+                        return qp;
+                    }
+                }
+            }
+        } else { // a1 is also an arbitrary length atom
+            if (a2.getRoles().containsAll(a1.getRoles())) { // roles of a1 subset of roles of a2
+                // check vars
+                if (a1.getLeft().equals(a2.getLeft())) {  // append to front
+                    // create a copy of the query
+                    qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // remove atoms
+                    qp.getBody().remove(a1);
+                    qp.getBody().remove(a2);
+                    // generate new atoms
+                    r1 = new ArbitraryLengthAtom(a1.getRoles(), new Variable(a1.getLeft().getName()),
+                            new Variable(a1.getRight().getName()));
+                    r2 = new ArbitraryLengthAtom(a2.getRoles(), new Variable(a1.getRight().getName()),
+                            new Variable(a2.getRight().getName()));
+                    // add atoms to query body
+                    qp.getBody().add(r1);
+                    qp.getBody().add(r2);
+                    // return result
+                    return qp;
+                } else if (a1.getRight().equals(a2.getRight())) {  // append to back
+                    // create a copy of the query
+                    qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // remove atoms
+                    qp.getBody().remove(a1);
+                    qp.getBody().remove(a2);
+                    // generate new atoms
+                    r1 = new ArbitraryLengthAtom(a1.getRoles(), new Variable(a1.getLeft().getName()),
+                            new Variable(a1.getRight().getName()));
+                    r2 = new ArbitraryLengthAtom(a2.getRoles(), new Variable(a2.getLeft().getName()),
+                            new Variable(a1.getLeft().getName()));
+                    // add atoms to query body
+                    qp.getBody().add(r1);
+                    qp.getBody().add(r2);
+                    // return result
+                    return qp;
+                }
+            }
+        }
+        // if no concat possible, return original query
+        return q;
     }
 
     /**
-     * Given a Xi-restricted query q, and two binary atoms in q, return the result of merging them.
-     * Precondition: they can be merged i.e., they have a nonempty intersection of roles.
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of merging them, assuming
+     * they can be merged i.e., they have a nonempty intersection of roles.
+     * Note that in the case of {@link Roles}, it can happen that there are two different results for merging
+     * because of the inverse roles occurring in the roles.
      *
-     * @param q  Xi-restricted query.
-     * @param a1 A binary atom.
-     * @param a2 A binary atom.
-     * @return A Xi-restricted query q'.
+     * @param q Xi-restricted query.
+     * @param a1 A single path atom.
+     * @param a2 A single path atom.
+     * @return A set of Xi-restricted queries Q' (can be empty).
      */
     @Override
     public Set<RewritableQuery> merge(RewritableQuery q, Binary a1, Binary a2) {
@@ -262,7 +400,7 @@ public class RewriterImpl implements Rewriter {
                     merges.add(unifier.apply(qp));
                 }
             }
-        } else {
+        } else {  // arbitary length atom - only directed roles
             intersection = new HashSet<>(a1.getRoles());
             intersection.retainAll(a2.getRoles());
             if (intersection.size() > 0) {
@@ -307,6 +445,15 @@ public class RewriterImpl implements Rewriter {
     @Override
     public RewritableQuery drop(RewritableQuery q, ArbitraryLengthAtom a) {
         // remember: no empty query body!
+        if (q.getBody().size() > 1 &&
+                (a.getLeft() instanceof UnboundVariable || a.getRight() instanceof UnboundVariable)) {
+            // create copy of query
+            RewritableQuery qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+            // remove arb. length atom with unbound variable
+            qp.getBody().remove(a);
+            // return new query
+            return qp;
+        }
         return q;
     }
 
