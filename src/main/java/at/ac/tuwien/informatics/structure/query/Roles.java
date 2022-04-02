@@ -162,12 +162,12 @@ public class Roles implements Binary {
                 if (this.right instanceof UnboundVariable && this.roles.contains(property)) {
                     // R(x,_)
                     newatom = new Roles(new HashSet<>(
-                            Collections.singleton(property)),
+                            Collections.singleton(i.getProperty())),
                             this.left.getFresh(), this.right.getFresh());
                 } else {
                     // R-(_,y)
                     newatom = new Roles(new HashSet<>(
-                            Collections.singleton(property.getInverseProperty())),
+                            Collections.singleton(i.getProperty().getInverseProperty())),
                             this.left.getFresh(), this.right.getFresh());
                 }
                 newatom.saturate(o);
@@ -181,11 +181,11 @@ public class Roles implements Binary {
         OWLObjectPropertyExpression property = ((OWLObjectSomeValuesFrom) ii).getProperty();
         if (this.right instanceof UnboundVariable && this.roles.contains(property)) {
             // R(x,_)
-            newatom = new Roles(new HashSet<>(Collections.singleton(property)), this.right.getFresh(),
+            newatom = new Roles(new HashSet<>(Collections.singleton(i.getProperty())), this.right.getFresh(),
                     this.left.getFresh());
         } else {
             // R-(_,y)
-            newatom = new Roles(new HashSet<>(Collections.singleton(property.getInverseProperty())),
+            newatom = new Roles(new HashSet<>(Collections.singleton(i.getProperty().getInverseProperty())),
                     this.right.getFresh(), this.left.getFresh());
         }
         newatom.saturate(o);

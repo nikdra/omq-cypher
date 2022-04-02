@@ -40,11 +40,13 @@ public interface Rewriter {
     RewritableQuery tau(RewritableQuery q);
 
     /**
-     * Given a Xi-restricted query q, and two binary atoms in q, return the result of concatenating them.
-     * Precondition: they can be concatenated i.e., they have a nonempty intersection of roles, terms in the correct
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of concatenating them, assuming
+     * they can be concatenated i.e., they have a nonempty intersection of roles, terms in the correct
      * places and one of them is of arbitrary length.
+     * Note that even in the presence of inverses in {@link Roles}, there is only one possible way of concatenating the
+     * atom with an arbitrary length atom.
      *
-     * @param q Xi-restricted query.
+     * @param q  Xi-restricted query.
      * @param a1 A binary atom.
      * @param a2 An arbitrary length atom.
      * @return A Xi-restricted query q'.
@@ -52,13 +54,15 @@ public interface Rewriter {
     RewritableQuery concatenate(RewritableQuery q, Binary a1, ArbitraryLengthAtom a2);
 
     /**
-     * Given a Xi-restricted query q, and two binary atoms in q, return the result of merging them.
-     * Precondition: they can be merged i.e., they have a nonempty intersection of roles.
+     * Given a Xi-restricted query q, and two binary atoms in q, return the result of merging them, assuming
+     * they can be merged i.e., they have a nonempty intersection of roles.
+     * Note that in the case of {@link Roles}, it can happen that there are two different results for merging
+     * because of the inverse roles occurring in the roles.
      *
      * @param q Xi-restricted query.
      * @param a1 A single path atom.
      * @param a2 A single path atom.
-     * @return A Xi-restricted query q'.
+     * @return A set of Xi-restricted queries Q' (can be empty).
      */
     Set<RewritableQuery> merge(RewritableQuery q, Binary a1, Binary a2);
 

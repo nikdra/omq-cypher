@@ -7,6 +7,7 @@ import at.ac.tuwien.informatics.structure.query.*;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.*;
 
+import javax.management.relation.Role;
 import java.io.File;
 import java.util.*;
 
@@ -260,7 +261,7 @@ public class TestRewriterImpl {
         RewriterImpl rewriter = new RewriterImpl();
         InputQuery q;
         Set<RewritableQuery> Q;
-
+        // q(x):-teaches(x,y), Course(y)
         q = new InputQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("teaches"))),
@@ -316,7 +317,9 @@ public class TestRewriterImpl {
         RewriterImpl rewriter = new RewriterImpl();
         InputQuery q;
         Set<RewritableQuery> Q;
-
+        // q(x):-supervisedBy(x,y), Professor(y)
+        // this query needs to merge two roles atoms at some point such that
+        // GradStudent(x) (and its subclasses) can be derived from the query.
         q = new InputQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new Roles(new HashSet<>(Collections.singleton(
@@ -388,5 +391,89 @@ public class TestRewriterImpl {
                 ))));
 
         assertEquals(Qp, Q);
+    }
+
+    @Test
+    public void testCRPQWithConcatenationTwoTailArbitrary() throws OWLOntologyCreationException, NotOWL2QLException {
+        // load ontology
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/paths1.owl");
+
+        RewriterImpl rewriter = new RewriterImpl();
+        InputQuery q;
+        Set<RewritableQuery> Q;
+
+        // q():-t*(x,z1),s*(z1,z2),r(z2,x)
+        q = new InputQuery(new LinkedList<>(),
+                new HashSet<>(Arrays.asList(
+                        new Path(new LinkedList<>(Collections.singleton(
+                                new ArbitraryLengthPathElement(
+                                        new HashSet<>(Collections.singleton(o.getPropertyMap().get("t")))))),
+                                new Variable("y"), new Variable("z1")),
+                        new Path(new LinkedList<>(Collections.singleton(
+                                new ArbitraryLengthPathElement(
+                                        new HashSet<>(Collections.singleton(o.getPropertyMap().get("s")))))),
+                                new Variable("z1"), new Variable("z2")),
+                        new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))),
+                                new Variable("z2"), new Variable("x"))
+                )));
+
+        Q = rewriter.rewrite(q, o);
+
+        assertEquals(4, Q.size());
+    }
+
+    @Test
+    public void testCRPQWithConcatenationOneTailArb() throws OWLOntologyCreationException, NotOWL2QLException {
+        // load ontology
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/paths1.owl");
+
+        RewriterImpl rewriter = new RewriterImpl();
+        InputQuery q;
+        Set<RewritableQuery> Q;
+
+        // q():-t*(x,z1),s*(z1,z2),r(z2,x)
+        q = new InputQuery(new LinkedList<>(),
+                new HashSet<>(Arrays.asList(
+                        new Roles (new HashSet<>(Collections.singleton(o.getPropertyMap().get("t"))),
+                                new Variable("y"), new Variable("z1")),
+                        new Path(new LinkedList<>(Collections.singleton(
+                                new ArbitraryLengthPathElement(
+                                        new HashSet<>(Collections.singleton(o.getPropertyMap().get("s")))))),
+                                new Variable("z1"), new Variable("z2")),
+                        new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))),
+                                new Variable("z2"), new Variable("x"))
+                )));
+
+        Q = rewriter.rewrite(q, o);
+
+        assertEquals(11, Q.size());
+    }
+
+    @Test
+    public void testCRPQWithConcatenationNoDrop() throws OWLOntologyCreationException, NotOWL2QLException {
+        // load ontology
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/paths2.owl");
+
+        RewriterImpl rewriter = new RewriterImpl();
+        InputQuery q;
+        Set<RewritableQuery> Q;
+
+        // q():-A(x),r*(x,y),B(y)
+        q = new InputQuery(new LinkedList<>(),
+                new HashSet<>(Arrays.asList(
+                        new Conceptname(o.getClassMap().get("A"), new Variable("x")),
+                        new Path(new LinkedList<>(Collections.singleton(
+                                new ArbitraryLengthPathElement(
+                                        new HashSet<>(Collections.singleton(o.getPropertyMap().get("r")))))),
+                                new Variable("x"), new Variable("y")),
+                        new Conceptname(o.getClassMap().get("B"), new Variable("y"))
+                )));
+
+        Q = rewriter.rewrite(q, o);
+
+        assertEquals(14, Q.size());
     }
 }
