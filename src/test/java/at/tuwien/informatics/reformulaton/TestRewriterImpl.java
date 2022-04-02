@@ -333,52 +333,50 @@ public class TestRewriterImpl {
         Qp.add(new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new Roles(new HashSet<>(Arrays.asList(
-                                o.getPropertyMap().get("gradStudentSupervisedBy"),
+                                o.getPropertyMap().get("gradStudentSupervisedBy").getInverseProperty(),
                                 o.getPropertyMap().get("isSupervisedBy").getInverseProperty())),
-                                new Variable("x"), new Variable("y")),
+                                new Variable("y"), new Variable("x")),
                         new Conceptname(o.getClassMap().get("Professor"), new Variable("y"))
                 ))));
         Qp.add(new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new Roles(new HashSet<>(Arrays.asList(
-                                o.getPropertyMap().get("gradStudentSupervisedBy"),
+                                o.getPropertyMap().get("gradStudentSupervisedBy").getInverseProperty(),
                                 o.getPropertyMap().get("isSupervisedBy").getInverseProperty())),
-                                new Variable("x"), new Variable("y")),
+                                new Variable("y"), new Variable("x")),
                         new Conceptname(o.getClassMap().get("AssistantProfessor"), new Variable("y"))
                 ))));
         Qp.add(new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new Roles(new HashSet<>(Arrays.asList(
-                                o.getPropertyMap().get("gradStudentSupervisedBy"),
+                                o.getPropertyMap().get("gradStudentSupervisedBy").getInverseProperty(),
                                 o.getPropertyMap().get("isSupervisedBy").getInverseProperty())),
-                                new Variable("x"), new Variable("y")),
+                                new Variable("y"), new Variable("x")),
                         new Conceptname(o.getClassMap().get("AssociateProfessor"), new Variable("y"))
                 ))));
         Qp.add(new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new Roles(new HashSet<>(Arrays.asList(
-                                o.getPropertyMap().get("gradStudentSupervisedBy"),
+                                o.getPropertyMap().get("gradStudentSupervisedBy").getInverseProperty(),
                                 o.getPropertyMap().get("isSupervisedBy").getInverseProperty())),
-                                new Variable("x"), new Variable("y")),
+                                new Variable("y"), new Variable("x")),
                         new Conceptname(o.getClassMap().get("FullProfessor"), new Variable("y"))
                 ))));
         Qp.add(new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Arrays.asList(
                         new Roles(new HashSet<>(Arrays.asList(
-                                o.getPropertyMap().get("gradStudentSupervisedBy"),
-                                o.getPropertyMap().get("isSupervisedBy").getInverseProperty())),
-                                new Variable("x"), new Variable("y")),
-                        new Roles(new HashSet<>(Arrays.asList(
                                 o.getPropertyMap().get("gradStudentSupervisedBy").getInverseProperty(),
-                                o.getPropertyMap().get("isSupervisedBy"))),
-                                new Variable("y"), new UnboundVariable("z"))
+                                o.getPropertyMap().get("isSupervisedBy").getInverseProperty())),
+                                new Variable("y"), new Variable("x")),
+                        new Roles(new HashSet<>(Collections.singleton(
+                                o.getPropertyMap().get("gradStudentSupervisedBy"))),
+                                new UnboundVariable("z"), new Variable("y"))
                 ))));
         Qp.add(new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Collections.singleton(
-                        new Roles(new HashSet<>(Arrays.asList(
-                                o.getPropertyMap().get("gradStudentSupervisedBy").getInverseProperty(),
-                                o.getPropertyMap().get("isSupervisedBy"))),
-                                new Variable("y"), new Variable("x"))
+                        new Roles(new HashSet<>(Collections.singleton(
+                                o.getPropertyMap().get("gradStudentSupervisedBy").getInverseProperty())),
+                                new UnboundVariable("y"), new Variable("x"))
                 ))));
         Qp.add(new RewritableQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
                 new HashSet<>(Collections.singleton(

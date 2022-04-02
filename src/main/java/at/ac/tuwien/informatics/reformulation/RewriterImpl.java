@@ -4,8 +4,10 @@ import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.Unifier;
 import at.ac.tuwien.informatics.structure.query.*;
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * An implementation of a rewriter for XI-restricted queries.
@@ -46,6 +48,17 @@ public class RewriterImpl implements Rewriter {
                 for (RewritableAtom a1: qp.getBody()) {
                     for (RewritableAtom a2 : qp.getBody()) {
                         Q.add(tau(reduce(qp, a1, a2)));
+                    }
+                }
+
+                // (d) merge atoms, if possible
+                for (RewritableAtom a1: qp.getBody()) {
+                    for (RewritableAtom a2: qp.getBody()) {
+                        if(a1 instanceof Binary && a2 instanceof Binary) {
+                            Q.addAll(merge(qp, (Binary) a1, (Binary) a2).stream()
+                                    .map(this::tau)
+                                    .collect(Collectors.toSet()));
+                        }
                     }
                 }
                 // TODO path rewritings
@@ -190,13 +203,96 @@ public class RewriterImpl implements Rewriter {
      * Precondition: they can be merged i.e., they have a nonempty intersection of roles.
      *
      * @param q  Xi-restricted query.
-     * @param a1 A single path atom.
-     * @param a2 A single path atom.
+     * @param a1 A binary atom.
+     * @param a2 A binary atom.
      * @return A Xi-restricted query q'.
      */
     @Override
-    public RewritableQuery merge(RewritableQuery q, Binary a1, Binary a2) {
-        return null;
+    public Set<RewritableQuery> merge(RewritableQuery q, Binary a1, Binary a2) {
+        Set<OWLObjectPropertyExpression> intersection;
+        Set<RewritableQuery> merges = new HashSet<>();
+        Binary r1;
+        Binary r2;
+        Unifier unifier;
+        if (a1 instanceof Roles) {
+            // compute first intersection
+            intersection = new HashSet<>(a1.getRoles());
+            intersection.retainAll(a2.getRoles());
+            if (intersection.size() > 0) {
+                // do the terms of a1 and a2 unify?
+                unifier = new Unifier(Arrays.asList(a1.getLeft(), a1.getRight()),
+                        Arrays.asList(a2.getLeft(), a2.getRight()));
+                if (unifier.getSubstitutions().size() > 0) {
+                    // create a copy of the query
+                    RewritableQuery qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // remove atoms
+                    qp.getBody().remove(a1);
+                    qp.getBody().remove(a2);
+                    // generate new atoms
+                    r1 = new Roles(intersection, a1.getLeft(), a1.getRight());
+                    r2 = new Roles(intersection, a2.getLeft(), a2.getRight());
+                    // add atoms to query body
+                    qp.getBody().add(r1);
+                    qp.getBody().add(r2);
+                    // add the result of unification to the result
+                    merges.add(unifier.apply(qp));
+                }
+            }
+            // compute second intersection on the inverse of a1
+            a1 = ((Roles) a1).getInverse();
+            intersection = new HashSet<>(a1.getRoles());
+            intersection.retainAll(a2.getRoles());
+            if (intersection.size() > 0) {
+                // do the terms of a1 and a2 unify?
+                unifier = new Unifier(Arrays.asList(a1.getLeft(), a1.getRight()),
+                        Arrays.asList(a2.getLeft(), a2.getRight()));
+                if (unifier.getSubstitutions().size() > 0) {
+                    // create a copy of the query
+                    RewritableQuery qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // remove atoms
+                    qp.getBody().remove(a1);
+                    qp.getBody().remove(a2);
+                    // generate new atoms
+                    r1 = new Roles(intersection, a1.getLeft(), a1.getRight());
+                    r2 = new Roles(intersection, a2.getLeft(), a2.getRight());
+                    // add atoms to query body
+                    qp.getBody().add(r1);
+                    qp.getBody().add(r2);
+                    // add the result of unification to the result
+                    merges.add(unifier.apply(qp));
+                }
+            }
+        } else {
+            intersection = new HashSet<>(a1.getRoles());
+            intersection.retainAll(a2.getRoles());
+            if (intersection.size() > 0) {
+                // do the terms of a1 and a2 unify?
+                unifier = new Unifier(Arrays.asList(a1.getLeft(), a1.getRight()),
+                        Arrays.asList(a2.getLeft(), a2.getRight()));
+                if (unifier.getSubstitutions().size() > 0) {
+                    // create a copy of the query
+                    RewritableQuery qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // remove atoms
+                    qp.getBody().remove(a1);
+                    qp.getBody().remove(a2);
+                    // generate new atoms
+                    if (a2 instanceof ArbitraryLengthAtom) {
+                        r1 = new ArbitraryLengthAtom(intersection, a1.getLeft(), a1.getRight());
+                        r2 = new ArbitraryLengthAtom(intersection, a2.getLeft(), a2.getRight());
+                    } else {
+                        r1 = new Roles(intersection, a1.getLeft(), a1.getRight());
+                        r2 = new Roles(intersection, a2.getLeft(), a2.getRight());
+                    }
+                    // add atoms to query body
+                    qp.getBody().add(r1);
+                    qp.getBody().add(r2);
+
+                    // add the result of unification to the result
+                    merges.add(unifier.apply(qp));
+                }
+            }
+        }
+        return merges;
     }
 
     /**
@@ -248,16 +344,17 @@ public class RewriterImpl implements Rewriter {
                 // and invert all the roles in the set of roles.
                 Roles b3 = b1.getInverse();
                 if (b3.getRoles().equals(b2.getRoles())) {
+                    // no need to create a copy of the query, an inverse is the same as the original atom
                     // create a copy of the query
-                    RewritableQuery qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
+                    // RewritableQuery qp = new RewritableQuery(new LinkedList<>(q.getHead()), new HashSet<>(q.getBody()));
                     // remove b1
-                    qp.getBody().remove(b1);
+                    // qp.getBody().remove(b1);
                     // add b3
-                    qp.getBody().add(b3);
+                    // qp.getBody().add(b3);
                     // compute unifier, return result of applying the unifier to q
                     Unifier unifier = new Unifier(Arrays.asList(b3.getLeft(), b3.getRight()),
                             Arrays.asList(b2.getLeft(), b2.getRight()));
-                    return unifier.apply(qp);
+                    return unifier.apply(q);
                 }
             }
         } else if (a1 instanceof ArbitraryLengthAtom && a2 instanceof ArbitraryLengthAtom) {
