@@ -27,6 +27,7 @@ public interface RewritableAtom extends Atom {
      * Precondition for correctness: applicable was called before.
      * @param I The axiom to be applied.
      * @param o The ontology.
+     * @param rewriter The query rewriter that called apply on this atom.
      * @return The new atom.
      */
     RewritableAtom apply(OWLAxiom I, Ontology o, Rewriter rewriter);
