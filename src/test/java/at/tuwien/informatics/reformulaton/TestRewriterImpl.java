@@ -403,7 +403,7 @@ public class TestRewriterImpl {
         InputQuery q;
         Set<RewritableQuery> Q;
 
-        // q():-t*(x,z1),s*(z1,z2),r(z2,x)
+        // q():-t*(y,z1),s*(z1,z2),r(z2,x)
         q = new InputQuery(new LinkedList<>(),
                 new HashSet<>(Arrays.asList(
                         new Path(new LinkedList<>(Collections.singleton(
@@ -433,7 +433,7 @@ public class TestRewriterImpl {
         InputQuery q;
         Set<RewritableQuery> Q;
 
-        // q():-t*(x,z1),s*(z1,z2),r(z2,x)
+        // q():-t*(y,z1),s*(z1,z2),r(z2,x)
         q = new InputQuery(new LinkedList<>(),
                 new HashSet<>(Arrays.asList(
                         new Roles (new HashSet<>(Collections.singleton(o.getPropertyMap().get("t"))),
@@ -449,6 +449,34 @@ public class TestRewriterImpl {
         Q = rewriter.rewrite(q, o);
 
         assertEquals(11, Q.size());
+    }
+
+    @Test
+    public void testCRPQWithConcatenationOneTailArbOneAnswerVar() throws OWLOntologyCreationException, NotOWL2QLException {
+        // load ontology
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/paths1.owl");
+
+        RewriterImpl rewriter = new RewriterImpl();
+        InputQuery q;
+        Set<RewritableQuery> Q;
+
+        // q(x):-t*(y,z1),s*(z1,z2),r(z2,x)
+        q = new InputQuery(new LinkedList<>(Collections.singleton(new Variable("x"))),
+                new HashSet<>(Arrays.asList(
+                        new Roles (new HashSet<>(Collections.singleton(o.getPropertyMap().get("t"))),
+                                new Variable("y"), new Variable("z1")),
+                        new Path(new LinkedList<>(Collections.singleton(
+                                new ArbitraryLengthPathElement(
+                                        new HashSet<>(Collections.singleton(o.getPropertyMap().get("s")))))),
+                                new Variable("z1"), new Variable("z2")),
+                        new Roles(new HashSet<>(Collections.singleton(o.getPropertyMap().get("r"))),
+                                new Variable("z2"), new Variable("x"))
+                )));
+
+        Q = rewriter.rewrite(q, o);
+
+        assertEquals(12, Q.size());
     }
 
     @Test

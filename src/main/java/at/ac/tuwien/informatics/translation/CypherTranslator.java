@@ -54,34 +54,64 @@ public class CypherTranslator implements Translator {
                         ")";
                 matches.add(match);
             } else if (atom instanceof Roles) {
-                String match = "match (" +
-                        ((Roles) atom).getLeft().getName() +
-                        ")-[r" +
-                        ++variableCounter +
-                        ":" +
-                        String.join("|", ((Roles) atom).getRoles().stream().map(
-                                p -> p.getNamedProperty().getIRI().getFragment()
-                        ).collect(Collectors.toSet())) +
-                        "]-(" +
-                        ((Roles) atom).getRight().getName() +
-                        ")";
-                matches.add(match);
-                Set<String> atomdependencies = new HashSet<>();
-                for (OWLObjectPropertyExpression p : ((Roles) atom).getRoles()) {
-                    String dependency = "(startnode(r" +
-                            variableCounter +
-                            ")=" +
-                            ((p instanceof OWLObjectInverseOf) ? ((Roles) atom).getRight().getName() :
-                                    ((Roles) atom).getLeft().getName()) +
-                            " and type(r" +
-                            variableCounter +
-                            ")=\"" +
-                            p.getNamedProperty().getIRI().getFragment() +
-                            "\")";
-                    atomdependencies.add(dependency);
+                // performance consideration: if no mixing of directions, make directed
+                if (((Roles) atom).getRoles().stream().noneMatch(p -> p instanceof OWLObjectInverseOf)) {
+                    // all directed
+                    String match = "match (" +
+                            ((Roles) atom).getLeft().getName() +
+                            ")-[" +
+                            ":" +
+                            String.join("|", ((Roles) atom).getRoles().stream().map(
+                                    p -> p.getNamedProperty().getIRI().getFragment()
+                            ).collect(Collectors.toSet())) +
+                            "]->(" +
+                            ((Roles) atom).getRight().getName() +
+                            ")";
+                    matches.add(match);
+                } else if (((Roles) atom).getRoles().stream().allMatch(p -> p instanceof OWLObjectInverseOf)) {
+                    // all directed inverses
+                    String match = "match (" +
+                            ((Roles) atom).getLeft().getName() +
+                            ")<-[" +
+                            ":" +
+                            String.join("|", ((Roles) atom).getRoles().stream().map(
+                                    p -> p.getNamedProperty().getIRI().getFragment()
+                            ).collect(Collectors.toSet())) +
+                            "]-(" +
+                            ((Roles) atom).getRight().getName() +
+                            ")";
+                    matches.add(match);
+                } else {
+                    // mixing of directions
+                    String match = "match (" +
+                            ((Roles) atom).getLeft().getName() +
+                            ")-[r" +
+                            ++variableCounter +
+                            ":" +
+                            String.join("|", ((Roles) atom).getRoles().stream().map(
+                                    p -> p.getNamedProperty().getIRI().getFragment()
+                            ).collect(Collectors.toSet())) +
+                            "]-(" +
+                            ((Roles) atom).getRight().getName() +
+                            ")";
+                    matches.add(match);
+                    Set<String> atomdependencies = new HashSet<>();
+                    for (OWLObjectPropertyExpression p : ((Roles) atom).getRoles()) {
+                        String dependency = "(startnode(r" +
+                                variableCounter +
+                                ")=" +
+                                ((p instanceof OWLObjectInverseOf) ? ((Roles) atom).getRight().getName() :
+                                        ((Roles) atom).getLeft().getName()) +
+                                " and type(r" +
+                                variableCounter +
+                                ")=\"" +
+                                p.getNamedProperty().getIRI().getFragment() +
+                                "\")";
+                        atomdependencies.add(dependency);
+                    }
+                    dependencies.add("(" + String.join(" or ", atomdependencies) + ")");
                 }
-                dependencies.add("(" + String.join(" or ", atomdependencies) + ")");
-            } else {
+            } else { // Arbitrary length atom
                 String match = "match (" +
                         ((ArbitraryLengthAtom) atom).getLeft().getName() +
                         ")-[" +
