@@ -69,6 +69,9 @@ public class Cli {
         // rewrite query
         Set<RewritableQuery> rewritten_queries = rewriter.rewrite(q, ontology);
 
+        // print rewritten queries
+        rewritten_queries.forEach(System.out::println);
+
         // translate to query over the sources
         String translatedQuery = translator.translate(q.getHead(), rewritten_queries);
 
