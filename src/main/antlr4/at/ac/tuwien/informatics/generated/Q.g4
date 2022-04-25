@@ -2,7 +2,7 @@ grammar Q ;
 
 query : head ':-' body EOF ;
 
-head : 'q(' variable (',' variable)* ')' ;
+head : 'q(' (variable (',' variable)*)? ')' ;
 
 variable : WORD ;
 

@@ -240,4 +240,25 @@ public class TestInputQueryBuilder {
 
         assertNotEquals(q, q1);
     }
+
+    @Test
+    public void testBoolean() throws OWLOntologyCreationException, NotOWL2QLException {
+        File resourcesDirectory = new File("src/test/resources");
+        Ontology o = new Ontology(resourcesDirectory.getAbsolutePath() + "/university.owl");
+        CharStream cs = CharStreams.fromString("q():-Assistant_Prof(x)");
+        QLexer lexer = new QLexer(cs);
+        QParser parser = new QParser(new CommonTokenStream(lexer));
+
+        ParseTree tree = parser.query();
+
+        InputQuery q = (InputQuery) new InputQueryBuilder(o).visit(tree);
+
+        List<Variable> head = new LinkedList<>();
+        HashSet<Atom> body = new HashSet<>();
+        body.add(new Conceptname(o.getClassMap().get("Assistant_Prof"), new Variable("x")));
+
+        InputQuery q1 = new InputQuery(head, body);
+
+        assertEquals(q1, q);
+    }
 }
