@@ -3,7 +3,6 @@ package at.ac.tuwien.informatics.reformulation;
 import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.Unifier;
 import at.ac.tuwien.informatics.structure.query.*;
-import com.google.errorprone.annotations.Var;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
@@ -213,7 +212,7 @@ public class RewriterImpl implements Rewriter {
      */
     @Override
     public RewritableQuery concatenate(RewritableQuery q, Binary a1, ArbitraryLengthAtom a2) {
-        // small side-not: an unbound variable can become bound here, so we need to create new variables
+        // small side-note: an unbound variable can become bound here, so we need to create new variables
         RewritableQuery qp;
         Binary r1;
         Binary r2;

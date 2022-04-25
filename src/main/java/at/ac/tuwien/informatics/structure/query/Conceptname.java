@@ -98,7 +98,7 @@ public class Conceptname implements RewritableAtom {
             return new Conceptname(subclass, this.term.getFresh());
         }
         // domain/range axiom
-        UnboundVariable v = new UnboundVariable(rewriter .getFreshVariableName());
+        UnboundVariable v = new UnboundVariable(rewriter.getFreshVariableName());
         OWLObjectPropertyExpression property;
         if (I instanceof OWLObjectPropertyRangeAxiom) {  // exists r^- ISA A
             property = ((OWLObjectPropertyRangeAxiom) I).getProperty().getInverseProperty();

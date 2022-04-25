@@ -125,7 +125,7 @@ public class CypherTranslator implements Translator {
                 matches.add(match);
             }
         }
-        String returnClause = "return ";
+        String returnClause = "return distinct ";
         if (answerVars.size() == 0) {
             returnClause += "1";
         } else {

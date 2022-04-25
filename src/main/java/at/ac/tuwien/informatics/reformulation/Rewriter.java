@@ -98,5 +98,10 @@ public interface Rewriter {
      */
     RewritableQuery replace(RewritableQuery q, RewritableAtom a, Ontology o, OWLAxiom I);
 
+    /**
+     * Get a fresh variable name, which has not occurred in any query yet.
+     *
+     * @return new Variable name as a String.
+     */
     String getFreshVariableName();
 }

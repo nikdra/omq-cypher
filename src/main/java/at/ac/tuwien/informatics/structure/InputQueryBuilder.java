@@ -4,11 +4,9 @@ import at.ac.tuwien.informatics.generated.QBaseVisitor;
 import at.ac.tuwien.informatics.generated.QParser;
 import at.ac.tuwien.informatics.structure.query.*;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Class for extracting the query abstract syntax tree from the tree walk in the parser {@link QParser}.
