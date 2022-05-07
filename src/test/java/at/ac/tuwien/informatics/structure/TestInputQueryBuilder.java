@@ -1,4 +1,4 @@
-package at.tuwien.informatics.structure;
+package at.ac.tuwien.informatics.structure;
 import at.ac.tuwien.informatics.generated.QLexer;
 import at.ac.tuwien.informatics.generated.QParser;
 import at.ac.tuwien.informatics.structure.InputQueryBuilder;

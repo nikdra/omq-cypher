@@ -1,4 +1,4 @@
-package at.tuwien.informatics.structure;
+package at.ac.tuwien.informatics.structure;
 
 import at.ac.tuwien.informatics.structure.Ontology;
 import at.ac.tuwien.informatics.structure.Substitution;

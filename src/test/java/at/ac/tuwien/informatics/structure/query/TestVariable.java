@@ -1,4 +1,4 @@
-package at.tuwien.informatics.structure.query;
+package at.ac.tuwien.informatics.structure.query;
 
 import at.ac.tuwien.informatics.structure.query.Variable;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package at.tuwien.informatics.translation;
+package at.ac.tuwien.informatics.translation;
 
 import at.ac.tuwien.informatics.reformulation.RewriterImpl;
 import at.ac.tuwien.informatics.structure.Ontology;

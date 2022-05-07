@@ -1,4 +1,4 @@
-package at.tuwien.informatics.structure.query;
+package at.ac.tuwien.informatics.structure.query;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

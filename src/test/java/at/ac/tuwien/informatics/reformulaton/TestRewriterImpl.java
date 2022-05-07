@@ -1,4 +1,4 @@
-package at.tuwien.informatics.reformulaton;
+package at.ac.tuwien.informatics.reformulaton;
 
 import at.ac.tuwien.informatics.reformulation.RewriterImpl;
 import at.ac.tuwien.informatics.structure.Ontology;
@@ -7,7 +7,6 @@ import at.ac.tuwien.informatics.structure.query.*;
 import org.junit.jupiter.api.Test;
 import org.semanticweb.owlapi.model.*;
 
-import javax.management.relation.Role;
 import java.io.File;
 import java.util.*;
 
