@@ -1,0 +1,23 @@
+match (x:stroller)
+return distinct x as x
+union
+match (x:personal_mobility)
+return distinct x as x
+union
+match (x:adult)
+return distinct x as x
+union
+match (x:wheelchair)
+return distinct x as x
+union
+match (x:police_officer)
+return distinct x as x
+union
+match (x:pedestrian)
+return distinct x as x
+union
+match (x:child)
+return distinct x as x
+union
+match (x:construction_worker)
+return distinct x as x
